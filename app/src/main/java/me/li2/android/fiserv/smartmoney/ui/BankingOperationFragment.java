@@ -1,6 +1,7 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
@@ -103,12 +104,19 @@ public class BankingOperationFragment extends Fragment {
         return items;
     }
 
+    public void updateItem(@BankingOperation int operation, Drawable background) {
+        if (mAdapter != null) {
+            mAdapter.updateItem(operation, background);
+        }
+    }
+
     //-------- BankingOperationItem -----------------------------------------------------
 
     public static class BankingOperationItem {
         public @BankingOperation int operation;
         public int iconId;
         public int titleId;
+        public Drawable background;
 
         public BankingOperationItem(@BankingOperation int operation, int iconId, int titleId) {
             this.operation = operation;
@@ -143,6 +151,17 @@ public class BankingOperationFragment extends Fragment {
         public void onBindViewHolder(BankingOperationViewHolder holder, int position) {
             holder.bindBankingOperationItem(mItems.get(position), position);
         }
+
+        public void updateItem(@BankingOperation int operation, Drawable background) {
+            for (int i = 0; i < getItemCount(); i++) {
+                BankingOperationItem item = mItems.get(i);
+                if (item.operation == operation) {
+                    item.background = background;
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
     }
 
     //-------- BankingOperationViewHolder -----------------------------------------------
@@ -164,9 +183,14 @@ public class BankingOperationFragment extends Fragment {
         public void bindBankingOperationItem(BankingOperationItem item, int position) {
             if (item != null) {
                 mItem = item;
+                if (item.background != null) {
+                    mItemView.setBackground(item.background);
+                }
+
                 if (item.iconId > 0) {
                     mIconView.setImageResource(item.iconId);
                 }
+
                 mTitleView.setText(item.titleId);
 
                 if (item.operation == BANKING_OPERATION_INSIGHTS

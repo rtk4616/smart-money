@@ -2,6 +2,7 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -44,6 +45,25 @@ public class BankingActivity extends AppCompatActivity
         mBankingOperationFragment = (BankingOperationFragment)
                 getSupportFragmentManager().findFragmentById(R.id.banking_operation_fragment);
         mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBankingOperationBkg();
+    }
+
+    // TODO use retrofit download from website
+    private void updateBankingOperationBkg() {
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_insights));
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_OFFERS,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_offers));
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_WALLET,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
     }
 
     @Override
