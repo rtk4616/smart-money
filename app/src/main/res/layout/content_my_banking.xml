@@ -11,10 +11,13 @@
 
     <fragment
         android:id="@+id/banking_operation_fragment"
+        android:name="me.li2.android.fiserv.smartmoney.ui.BankingOperationFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:name="me.li2.android.fiserv.smartmoney.ui.BankingOperationFragment"/>
+        tools:layout="@layout/fragment_banking_operation"/>
 
 </android.support.constraint.ConstraintLayout>
 

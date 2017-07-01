@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:layoutDirection="rtl"
     android:fitsSystemWindows="true"
+    android:background="@drawable/i_background"
     tools:openDrawer="start">
 
     <include

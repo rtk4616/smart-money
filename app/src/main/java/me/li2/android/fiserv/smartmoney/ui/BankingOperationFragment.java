@@ -14,14 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.widget.SimpleDividerItemDecoration;
 
 /**
  * Created by weiyi on 01/07/2017.
@@ -29,7 +30,9 @@ import me.li2.android.fiserv.smartmoney.R;
  */
 
 public class BankingOperationFragment extends Fragment {
-    private static final String TAG = "BankingOperationFragment";
+    private static final String TAG = "BankingOperation";
+    private static final int LAYOUT_COLUMNS_NUMBER = 3;
+    private static final int LAYOUT_ROWS_NUMBER = 3;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({BANKING_OPERATION_PAY_MERCHANT, BANKING_OPERATION_PAY_BILL, BANKING_OPERATION_PAY_COMPANY,
@@ -61,10 +64,6 @@ public class BankingOperationFragment extends Fragment {
         void onBankingOperationSelect(@BankingOperation int operation);
     }
 
-    public void setData(List<BankingOperationItem> items) {
-        mBankingOperationItems = items;
-    }
-
     public void setOnBankingOperationSelectListener(OnBankingOperationSelectListener l) {
         mOnBankingOperationSelectListener = l;
     }
@@ -79,13 +78,13 @@ public class BankingOperationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_banking_operation, container, false);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(
+                getActivity(), LAYOUT_COLUMNS_NUMBER, GridLayoutManager.VERTICAL, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setScrollContainer(false);
         mRecyclerView.setNestedScrollingEnabled(false);
-        mRecyclerView.addItemDecoration(new SimpleListDividerDecorator(
-                ContextCompat.getDrawable(getContext(), android.R.drawable.divider_horizontal_dim_dark), true));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         return view;
     }
@@ -166,18 +165,18 @@ public class BankingOperationFragment extends Fragment {
 
     //-------- BankingOperationViewHolder -----------------------------------------------
 
-    private class BankingOperationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class BankingOperationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private BankingOperationItem mItem;
+
+        @BindView(R.id.itemIcon) ImageView mIconView;
+        @BindView(R.id.itemTitle) TextView mTitleView;
         private View mItemView;
-        private ImageView mIconView;
-        private TextView mTitleView;
 
         public BankingOperationViewHolder(View itemView) {
             super(itemView);
-            mItemView = itemView;
-            mIconView = (ImageView) itemView.findViewById(R.id.itemIcon);
-            mTitleView = (TextView) itemView.findViewById(R.id.itemTitle);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            mItemView = itemView;
         }
 
         public void bindBankingOperationItem(BankingOperationItem item, int position) {
@@ -196,7 +195,7 @@ public class BankingOperationFragment extends Fragment {
                 if (item.operation == BANKING_OPERATION_INSIGHTS
                         || item.operation == BANKING_OPERATION_OFFERS
                         || item.operation == BANKING_OPERATION_WALLET) {
-                    mTitleView.setTextColor(ContextCompat.getColor(mItemView.getContext(), android.R.color.white));
+                    mTitleView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
                 }
             }
         }
