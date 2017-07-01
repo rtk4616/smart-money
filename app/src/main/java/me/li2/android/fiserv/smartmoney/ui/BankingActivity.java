@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import me.li2.android.fiserv.smartmoney.R;
 
@@ -20,10 +21,13 @@ import me.li2.android.fiserv.smartmoney.R;
 public class BankingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private BankingOperationFragment mBankingOperationFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_banking);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -36,6 +40,10 @@ public class BankingActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mBankingOperationFragment = (BankingOperationFragment)
+                getSupportFragmentManager().findFragmentById(R.id.banking_operation_fragment);
+        mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
     }
 
     @Override
@@ -94,4 +102,40 @@ public class BankingActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private BankingOperationFragment.OnBankingOperationSelectListener mOnBankingOperationSelectListener =
+            new BankingOperationFragment.OnBankingOperationSelectListener() {
+                @Override
+                public void onBankingOperationSelect(@BankingOperationFragment.BankingOperation int operation) {
+                    Toast.makeText(getApplicationContext(), "banking operation " + operation, Toast.LENGTH_SHORT).show();
+                    switch (operation) {
+                        case BankingOperationFragment.BANKING_OPERATION_PAY_MERCHANT:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_PAY_BILL:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_PAY_COMPANY:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_PAY_PERSON:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_REQUEST_MONEY:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_DEPOSIT_CHECK:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_INSIGHTS:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_OFFERS:
+                            break;
+
+                        case BankingOperationFragment.BANKING_OPERATION_WALLET:
+                            break;
+                    }
+                }
+            };
 }
