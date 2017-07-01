@@ -10,6 +10,9 @@
     android:fitsSystemWindows="true"
     android:background="@drawable/i_background"
     tools:openDrawer="start">
+    <!-- NOTE21: layoutDirection works for all layout, if you want NavigationDrawer open
+     from right-to-left, but others layout direction still left-to-right, then you have to
+     also define layoutDirection for others. -->
 
     <include
         layout="@layout/app_bar_my_banking"

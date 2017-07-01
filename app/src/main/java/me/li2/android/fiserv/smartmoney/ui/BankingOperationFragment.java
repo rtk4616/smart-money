@@ -22,6 +22,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
 import me.li2.android.fiserv.smartmoney.widget.SimpleDividerItemDecoration;
 
 /**
@@ -52,9 +54,11 @@ public class BankingOperationFragment extends Fragment {
     public static final int BANKING_OPERATION_OFFERS = 7;
     public static final int BANKING_OPERATION_WALLET = 8;
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.account_info_view) View mAccountInfoView;
+    private AccountItemViewHolder mAccountItemViewHolder;
+
     private BankingOperationAdapter mAdapter;
-    private List<BankingOperationItem> mBankingOperationItems;
     private OnBankingOperationSelectListener mOnBankingOperationSelectListener;
 
     public BankingOperationFragment() {
@@ -78,28 +82,31 @@ public class BankingOperationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_banking_operation, container, false);
+        ButterKnife.bind(this, view);
+
         GridLayoutManager layoutManager = new GridLayoutManager(
                 getActivity(), LAYOUT_COLUMNS_NUMBER, GridLayoutManager.VERTICAL, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setScrollContainer(false);
         mRecyclerView.setNestedScrollingEnabled(false);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
         mRecyclerView.setAdapter(mAdapter);
+
+        createAccountItemViewHolder();
         return view;
     }
 
     private ArrayList<BankingOperationItem> createItems() {
         ArrayList<BankingOperationItem> items  = new ArrayList<>();
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_COMPANY, R.drawable.i_banking_pay_company, R.string.banking_operation_pay_company));
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_BILL, R.drawable.i_banking_pay_bill, R.string.banking_operation_pay_bill));
         items.add(new BankingOperationItem(BANKING_OPERATION_PAY_MERCHANT, R.drawable.i_banking_pay_merchant, R.string.banking_operation_pay_merchant));
-        items.add(new BankingOperationItem(BANKING_OPERATION_DEPOSIT_CHECK, R.drawable.i_banking_deposit_check, R.string.banking_operation_deposit_check));
-        items.add(new BankingOperationItem(BANKING_OPERATION_REQUEST_MONEY, R.drawable.i_banking_request_money, R.string.banking_operation_request_money));
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_BILL, R.drawable.i_banking_pay_bill, R.string.banking_operation_pay_bill));
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_COMPANY, R.drawable.i_banking_pay_company, R.string.banking_operation_pay_company));
         items.add(new BankingOperationItem(BANKING_OPERATION_PAY_PERSON, R.drawable.i_banking_pay_person, R.string.banking_operation_pay_person));
-        items.add(new BankingOperationItem(BANKING_OPERATION_WALLET, -1, R.string.banking_operation_wallet));
-        items.add(new BankingOperationItem(BANKING_OPERATION_OFFERS, -1, R.string.banking_operation_offers));
+        items.add(new BankingOperationItem(BANKING_OPERATION_REQUEST_MONEY, R.drawable.i_banking_request_money, R.string.banking_operation_request_money));
+        items.add(new BankingOperationItem(BANKING_OPERATION_DEPOSIT_CHECK, R.drawable.i_banking_deposit_check, R.string.banking_operation_deposit_check));
         items.add(new BankingOperationItem(BANKING_OPERATION_INSIGHTS, -1, R.string.banking_operation_insights));
+        items.add(new BankingOperationItem(BANKING_OPERATION_OFFERS, -1, R.string.banking_operation_offers));
+        items.add(new BankingOperationItem(BANKING_OPERATION_WALLET, -1, R.string.banking_operation_wallet));
         return items;
     }
 
@@ -108,6 +115,21 @@ public class BankingOperationFragment extends Fragment {
             mAdapter.updateItem(operation, background);
         }
     }
+
+    //-------- Account View Holder ------------------------------------------------------
+
+    private void createAccountItemViewHolder() {
+        //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
+        //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.list_account_item, parent, false);
+        mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView);
+    }
+
+    public void updateAccountItemView(AccountItem accountItem) {
+        if (mAccountItemViewHolder != null) {
+            mAccountItemViewHolder.bindAccountItem(accountItem, 0);
+        }
+    }
+
 
     //-------- BankingOperationItem -----------------------------------------------------
 

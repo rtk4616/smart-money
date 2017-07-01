@@ -3,4 +3,7 @@
     <color name="colorPrimary">#384243</color>
     <color name="colorPrimaryDark">#333c3d</color>
     <color name="colorAccent">#8cf46c</color>
+    <color name="line_divider_color">@color/light_grey</color>
+
+    <color name="light_grey">#D3D3D3</color>
 </resources>

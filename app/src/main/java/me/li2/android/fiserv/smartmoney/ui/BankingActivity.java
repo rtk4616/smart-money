@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.AccountItem;
 
 /**
  * Created by weiyi on 01/07/2017.
@@ -50,10 +51,12 @@ public class BankingActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        // Test
         updateBankingOperationBkg();
+        AccountItem item = new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f);
+        mBankingOperationFragment.updateAccountItemView(item);
     }
 
-    // TODO use retrofit download from website
     private void updateBankingOperationBkg() {
         mBankingOperationFragment.updateItem(
                 BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
