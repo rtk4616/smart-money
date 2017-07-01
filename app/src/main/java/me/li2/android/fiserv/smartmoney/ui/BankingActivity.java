@@ -1,4 +1,4 @@
-package me.li2.android.fiserv.smartmoney;
+package me.li2.android.fiserv.smartmoney.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -10,7 +10,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MyBankingActivity extends AppCompatActivity
+import me.li2.android.fiserv.smartmoney.R;
+
+/**
+ * Created by weiyi on 01/07/2017.
+ * https://github.com/li2
+ */
+
+public class BankingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
