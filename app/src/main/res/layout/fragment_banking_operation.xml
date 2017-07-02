@@ -1,67 +1,161 @@
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
 
-    <TableLayout
-        android:layout_width="match_parent"
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        android:id="@+id/guideline1"
+        app:layout_constraintGuide_percent="0.33"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="169dp"
+        tools:layout_editor_absoluteX="0dp"/>
 
-        <TableRow>
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_height="@dimen/account_item_size"
-                android:paddingTop="@dimen/general_layout_margin"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:layout_weight="0.3">
-                <TextView
-                    android:id="@+id/account_number_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.6"
-                    android:paddingBottom="-8dp"
-                    android:gravity="center"
-                    android:text="5"
-                    android:textAppearance="@style/TextAppearance.ListItem.SuperLarge"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.4"
-                    android:gravity="center"
-                    android:text="@string/accounts"
-                    android:textAppearance="@style/TextAppearance.ListItem.Large"/>
-            </LinearLayout>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.21"
+        tools:layout_editor_absoluteY="108dp"
+        tools:layout_editor_absoluteX="0dp"/>
 
-            <include
-                android:id="@+id/account_info_view"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/account_item_size"
-                layout="@layout/list_account_item"/>
-        </TableRow>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.32"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="123dp"/>
 
-        <TableRow>
-            <ImageView
-                android:layout_width="@dimen/banking_operation_icon_size"
-                android:layout_height="@dimen/banking_operation_icon_size"
-                android:src="@drawable/i_transfer"/>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1"
+        tools:layout_editor_absoluteY="51dp"
+        tools:layout_editor_absoluteX="0dp"/>
 
-            <TextView
-                android:text="@string/transfer_between_accounts"
-                android:textAppearance="@style/TextAppearance.ListItem.Small"
-                android:textAllCaps="true"
-                android:gravity="center_vertical"/>
+    <TextView
+        android:id="@+id/account_number_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:text="5"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.ListItem.SuperLarge"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="0dp"/>
 
-        </TableRow>
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="@string/accounts"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.ListItem.Large"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:layout_constraintVertical_bias="0.0"/>
 
-    </TableLayout>
+    <include
+        android:id="@+id/account_info_view"
+        layout="@layout/list_account_item"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="32dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:layout_marginStart="32dp"/>
+
+
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/i_transfer"
+        android:id="@+id/imageView2"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
+        android:layout_marginRight="8dp"
+        app:layout_constraintTop_toTopOf="@+id/guideline3"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:text="@string/transfer_between_accounts"
+        android:textAppearance="@style/TextAppearance.ListItem.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+        app:layout_constraintLeft_toRightOf="@+id/imageView2"
+        app:layout_constraintTop_toTopOf="@+id/imageView2"/>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:overScrollMode="never"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline1"
+        app:layout_constraintVertical_bias="0.0"/>
 
-</RelativeLayout>
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/line_divider"
+        app:layout_constraintBottom_toBottomOf="@+id/textView2"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/account_number_view"
+        app:layout_constraintVertical_bias="0.5"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/line_divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/account_info_view"/>
+
+</android.support.constraint.ConstraintLayout>
