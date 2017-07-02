@@ -10,10 +10,9 @@
     <dimen name="general_layout_margin">8dp</dimen>
 
     <!-- account list item -->
-    <dimen name="account_item_size">112dp</dimen>
+    <dimen name="account_icon_size">80dp</dimen>
 
     <!-- banking operation list item -->
-    <dimen name="banking_operation_item_size">120dp</dimen>
     <dimen name="banking_operation_icon_size">36dp</dimen>
 
 </resources>
