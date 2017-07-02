@@ -24,4 +24,9 @@
     <style name="TextAppearance.ListItem.Medium" parent="@android:style/TextAppearance.Holo.Medium"/> <!-- 18sp -->
     <style name="TextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Holo.Small"/> <!-- 14sp -->
 
+    <style name="WidgetBackground">
+        <item name="android:alpha">0.7</item>
+        <item name="android:background">@color/widget_background</item>
+    </style>
+
 </resources>
