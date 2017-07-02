@@ -3,12 +3,59 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/account_info_view"
+    <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/account_item_size"
-        android:layout_alignParentTop="true"
-        layout="@layout/list_account_item"/>
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <TableRow>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_height="@dimen/account_item_size"
+                android:paddingTop="@dimen/general_layout_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                android:layout_weight="0.3">
+                <TextView
+                    android:id="@+id/account_number_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.6"
+                    android:paddingBottom="-8dp"
+                    android:gravity="center"
+                    android:text="5"
+                    android:textAppearance="@style/TextAppearance.ListItem.SuperLarge"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.4"
+                    android:gravity="center"
+                    android:text="@string/accounts"
+                    android:textAppearance="@style/TextAppearance.ListItem.Large"/>
+            </LinearLayout>
+
+            <include
+                android:id="@+id/account_info_view"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/account_item_size"
+                layout="@layout/list_account_item"/>
+        </TableRow>
+
+        <TableRow>
+            <ImageView
+                android:layout_width="@dimen/banking_operation_icon_size"
+                android:layout_height="@dimen/banking_operation_icon_size"
+                android:src="@drawable/i_transfer"/>
+
+            <TextView
+                android:text="@string/transfer_between_accounts"
+                android:textAppearance="@style/TextAppearance.ListItem.Small"
+                android:textAllCaps="true"
+                android:gravity="center_vertical"/>
+
+        </TableRow>
+
+    </TableLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

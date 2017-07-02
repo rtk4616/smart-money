@@ -17,4 +17,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+    <style name="TextAppearance.ListItem.SuperLarge" parent="@android:style/TextAppearance.Holo.Large">
+        <item name="android:textSize">48sp</item>
+    </style>
+    <style name="TextAppearance.ListItem.Large" parent="@android:style/TextAppearance.Holo.Large"/> <!-- 22sp -->
+    <style name="TextAppearance.ListItem.Medium" parent="@android:style/TextAppearance.Holo.Medium"/> <!-- 18sp -->
+    <style name="TextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Holo.Small"/> <!-- 14sp -->
+
 </resources>
