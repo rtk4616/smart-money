@@ -2,6 +2,8 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -43,8 +45,16 @@ public class BankingActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mBankingOperationFragment = (BankingOperationFragment)
-                getSupportFragmentManager().findFragmentById(R.id.banking_operation_fragment);
+        // NOTE21: add fragment programmatically, instead of inflated in the layout.
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment  = fm.findFragmentById(R.id.fragment_container);
+
+        if (fragment == null) {
+            fragment = new BankingOperationFragment();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+            fm.executePendingTransactions();
+        }
+        mBankingOperationFragment = (BankingOperationFragment) fragment;
         mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
     }
 
@@ -52,21 +62,8 @@ public class BankingActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         // Test
-        updateBankingOperationBkg();
         AccountItem item = new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f);
         mBankingOperationFragment.updateAccountItemView(item);
-    }
-
-    private void updateBankingOperationBkg() {
-        mBankingOperationFragment.updateItem(
-                BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_insights));
-        mBankingOperationFragment.updateItem(
-                BankingOperationFragment.BANKING_OPERATION_OFFERS,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_offers));
-        mBankingOperationFragment.updateItem(
-                BankingOperationFragment.BANKING_OPERATION_WALLET,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
     }
 
     @Override
@@ -126,6 +123,9 @@ public class BankingActivity extends AppCompatActivity
         return true;
     }
 
+
+    //-------- BankingOperationFragment -------------------------------------------------
+
     private BankingOperationFragment.OnBankingOperationSelectListener mOnBankingOperationSelectListener =
             new BankingOperationFragment.OnBankingOperationSelectListener() {
                 @Override
@@ -160,5 +160,22 @@ public class BankingActivity extends AppCompatActivity
                             break;
                     }
                 }
+
+                @Override
+                public void onRecyclerViewSetup() {
+                    updateBankingOperationBkg();
+                }
             };
+
+    private void updateBankingOperationBkg() {
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_insights));
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_OFFERS,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_offers));
+        mBankingOperationFragment.updateItem(
+                BankingOperationFragment.BANKING_OPERATION_WALLET,
+                ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
+    }
 }

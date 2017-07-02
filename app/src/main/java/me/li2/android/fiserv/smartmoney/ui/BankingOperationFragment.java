@@ -8,9 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -66,6 +68,7 @@ public class BankingOperationFragment extends Fragment {
 
     public interface OnBankingOperationSelectListener {
         void onBankingOperationSelect(@BankingOperation int operation);
+        void onRecyclerViewSetup();
     }
 
     public void setOnBankingOperationSelectListener(OnBankingOperationSelectListener l) {
@@ -76,7 +79,6 @@ public class BankingOperationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mAdapter = new BankingOperationAdapter(getActivity(), createItems());
     }
 
     @Override
@@ -84,13 +86,25 @@ public class BankingOperationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_banking_operation, container, false);
         ButterKnife.bind(this, view);
 
+        final RecyclerView recyclerView = mRecyclerView;
         GridLayoutManager layoutManager = new GridLayoutManager(
                 getActivity(), LAYOUT_COLUMNS_NUMBER, GridLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setScrollContainer(false);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setScrollContainer(false);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Log.d(TAG, "RecyclerView height is ready " + recyclerView.getMeasuredHeight());
+                recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mAdapter = new BankingOperationAdapter(getActivity(), createItems(), recyclerView.getMeasuredHeight());
+                recyclerView.setAdapter(mAdapter);
+                if (mOnBankingOperationSelectListener != null) {
+                    mOnBankingOperationSelectListener.onRecyclerViewSetup();
+                }
+            }
+        });
 
         createAccountItemViewHolder();
         return view;
@@ -151,10 +165,12 @@ public class BankingOperationFragment extends Fragment {
     private class BankingOperationAdapter extends RecyclerView.Adapter<BankingOperationViewHolder> {
         private Context mContext;
         private List<BankingOperationItem> mItems;
+        private int mContainerHeight;
 
-        public BankingOperationAdapter(Context context, List<BankingOperationItem> items) {
+        public BankingOperationAdapter(Context context, List<BankingOperationItem> items, int containerHeight) {
             mContext = context;
             mItems = items;
+            mContainerHeight = containerHeight;
         }
 
         @Override
@@ -165,6 +181,12 @@ public class BankingOperationFragment extends Fragment {
         @Override
         public BankingOperationViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(mContext).inflate(R.layout.list_banking_operation_item, parent, false);
+            // NOTE21: to fix issue that cannot set item with fixed height, because parent.getMeasuredHeight() always return 0.
+            if (mContainerHeight != 0) {
+                int itemWidth = ViewGroup.LayoutParams.MATCH_PARENT;
+                int itemHeight = mContainerHeight / LAYOUT_ROWS_NUMBER;
+                itemView.setLayoutParams(new GridLayoutManager.LayoutParams(itemWidth, itemHeight));
+            }
             return new BankingOperationViewHolder(itemView);
         }
 
@@ -188,8 +210,8 @@ public class BankingOperationFragment extends Fragment {
     //-------- BankingOperationViewHolder -----------------------------------------------
 
     public class BankingOperationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private Context mContext;
         private BankingOperationItem mItem;
-
         @BindView(R.id.itemIcon) ImageView mIconView;
         @BindView(R.id.itemTitle) TextView mTitleView;
         private View mItemView;
@@ -198,15 +220,13 @@ public class BankingOperationFragment extends Fragment {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            mContext = itemView.getContext();
             mItemView = itemView;
         }
 
         public void bindBankingOperationItem(BankingOperationItem item, int position) {
             if (item != null) {
                 mItem = item;
-                if (item.background != null) {
-                    mItemView.setBackground(item.background);
-                }
 
                 if (item.iconId > 0) {
                     mIconView.setImageResource(item.iconId);
@@ -217,7 +237,19 @@ public class BankingOperationFragment extends Fragment {
                 if (item.operation == BANKING_OPERATION_INSIGHTS
                         || item.operation == BANKING_OPERATION_OFFERS
                         || item.operation == BANKING_OPERATION_WALLET) {
-                    mTitleView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                    mTitleView.setTextColor(ContextCompat.getColor(mContext, android.R.color.white));
+                }
+
+                if (item.background != null) {
+                    mItemView.setBackground(item.background);
+                } else {
+                    if (item.operation == BANKING_OPERATION_INSIGHTS) {
+                        mItemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.i_banking_insights));
+                    } else if (item.operation == BANKING_OPERATION_OFFERS) {
+                        mItemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.i_banking_offers));
+                    } else if (item.operation == BANKING_OPERATION_WALLET) {
+                        mItemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.i_banking_wallet));
+                    }
                 }
             }
         }

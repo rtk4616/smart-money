@@ -10,15 +10,10 @@
     tools:context="me.li2.android.fiserv.smartmoney.ui.BankingActivity"
     tools:showIn="@layout/app_bar_my_banking">
 
-    <fragment
-        android:id="@+id/banking_operation_fragment"
-        android:name="me.li2.android.fiserv.smartmoney.ui.BankingOperationFragment"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout="@layout/fragment_banking_operation"/>
+        android:layout_height="match_parent"/>
 
 </android.support.constraint.ConstraintLayout>
 
