@@ -10,12 +10,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
 
 /**
  * Created by weiyi on 01/07/2017.
@@ -25,6 +27,8 @@ import me.li2.android.fiserv.smartmoney.model.AccountItem;
 public class BankingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "BankingActivity";
+    private AccountListFragment mAccountListFragment;
     private BankingOperationFragment mBankingOperationFragment;
 
     @Override
@@ -45,17 +49,8 @@ public class BankingActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // NOTE21: add fragment programmatically, instead of inflated in the layout.
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment  = fm.findFragmentById(R.id.fragment_container);
-
-        if (fragment == null) {
-            fragment = new BankingOperationFragment();
-            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
-            fm.executePendingTransactions();
-        }
-        mBankingOperationFragment = (BankingOperationFragment) fragment;
-        mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
+        setupAccountListFragment();
+        //setupBankingOperationFragment();
     }
 
     @Override
@@ -63,7 +58,9 @@ public class BankingActivity extends AppCompatActivity
         super.onResume();
         // Test
         AccountItem item = new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f);
-        mBankingOperationFragment.updateAccountItemView(item);
+        if (mBankingOperationFragment != null) {
+            mBankingOperationFragment.updateAccountItemView(item);
+        }
     }
 
     @Override
@@ -124,7 +121,45 @@ public class BankingActivity extends AppCompatActivity
     }
 
 
+    //-------- AccountListFragment ------------------------------------------------------
+
+    private void setupAccountListFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment  = fm.findFragmentById(R.id.fragment_account_list_container);
+
+        if (fragment == null) {
+            fragment = new AccountListFragment();
+            fm.beginTransaction().add(R.id.fragment_account_list_container, fragment).commit();
+            fm.executePendingTransactions();
+        }
+        mAccountListFragment = (AccountListFragment) fragment;
+        mAccountListFragment.setOnAccountSelectListener(mOnAccountSelectListener);
+    }
+
+    private AccountItemViewHolder.OnAccountSelectListener mOnAccountSelectListener =
+            new AccountItemViewHolder.OnAccountSelectListener() {
+                @Override
+                public void onAccountSelect(AccountItem accountItem) {
+                    Log.d(TAG, "Select account " + accountItem.name);
+                }
+            };
+
+
     //-------- BankingOperationFragment -------------------------------------------------
+
+    private void setupBankingOperationFragment() {
+        // NOTE21: add fragment programmatically, instead of inflated in the layout.
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment  = fm.findFragmentById(R.id.fragment_banking_operation_container);
+
+        if (fragment == null) {
+            fragment = new BankingOperationFragment();
+            fm.beginTransaction().add(R.id.fragment_banking_operation_container, fragment).commit();
+            fm.executePendingTransactions();
+        }
+        mBankingOperationFragment = (BankingOperationFragment) fragment;
+        mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
+    }
 
     private BankingOperationFragment.OnBankingOperationSelectListener mOnBankingOperationSelectListener =
             new BankingOperationFragment.OnBankingOperationSelectListener() {

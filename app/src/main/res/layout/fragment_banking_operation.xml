@@ -41,7 +41,6 @@
         tools:layout_editor_absoluteX="0dp"/>
 
     <View
-        style="@style/WidgetBackground"
         android:id="@+id/view2"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -49,6 +48,7 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
+        android:background="@color/widget_background"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@+id/imageView2"
@@ -123,12 +123,12 @@
 
 
     <android.support.v7.widget.RecyclerView
-        style="@style/WidgetBackground"
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:overScrollMode="never"
+        android:background="@color/widget_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"

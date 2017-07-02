@@ -38,11 +38,12 @@ public class AccountItemViewHolder extends RecyclerView.ViewHolder implements Vi
     @BindView(R.id.account_id_view) TextView mIdView;
     @BindView(R.id.account_balance_view) TextView mBalanceView;
 
-    public AccountItemViewHolder(View itemView) {
+    public AccountItemViewHolder(View itemView, OnAccountSelectListener l) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(this);
         mContext = itemView.getContext();
+        mOnAccountSelectListener = l;
     }
 
     public void bindAccountItem(AccountItem item, int position) {

@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#333c3d</color>
     <color name="colorAccent">#8cf46c</color>
     <color name="line_divider_color">@color/light_grey</color>
-    <color name="widget_background">#F1FBEE</color>
-
     <color name="light_grey">#D3D3D3</color>
+    <!-- built-in tool to adjust color and alpha/opacity value, no need to set background alpha -->
+    <color name="widget_background">#9af1fbee</color>
 </resources>
