@@ -50,17 +50,6 @@ public class BankingActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setupAccountListFragment();
-        //setupBankingOperationFragment();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Test
-        AccountItem item = new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f);
-        if (mBankingOperationFragment != null) {
-            mBankingOperationFragment.updateAccountItemView(item);
-        }
     }
 
     @Override
@@ -121,6 +110,24 @@ public class BankingActivity extends AppCompatActivity
     }
 
 
+    private void showFragment(Fragment fragment) {
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.anim.slide_in_left, -1)
+                    .show(fragment)
+                    .commit();
+        }
+    }
+
+    private void hideFragment(Fragment fragment) {
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(-1, android.R.anim.slide_out_right)
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
     //-------- AccountListFragment ------------------------------------------------------
 
     private void setupAccountListFragment() {
@@ -141,19 +148,26 @@ public class BankingActivity extends AppCompatActivity
                 @Override
                 public void onAccountSelect(AccountItem accountItem) {
                     Log.d(TAG, "Select account " + accountItem.name);
+                    if (mBankingOperationFragment == null) {
+                        setupBankingOperationFragment(accountItem);
+                    } else {
+                        showFragment(mBankingOperationFragment);
+                        mBankingOperationFragment.updateAccountItemView(accountItem);
+                    }
+                    hideFragment(mAccountListFragment);
                 }
             };
 
 
     //-------- BankingOperationFragment -------------------------------------------------
 
-    private void setupBankingOperationFragment() {
+    private void setupBankingOperationFragment(AccountItem accountItem) {
         // NOTE21: add fragment programmatically, instead of inflated in the layout.
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment  = fm.findFragmentById(R.id.fragment_banking_operation_container);
 
         if (fragment == null) {
-            fragment = new BankingOperationFragment();
+            fragment = BankingOperationFragment.newInstance(accountItem);
             fm.beginTransaction().add(R.id.fragment_banking_operation_container, fragment).commit();
             fm.executePendingTransactions();
         }
@@ -199,6 +213,12 @@ public class BankingActivity extends AppCompatActivity
                 @Override
                 public void onRecyclerViewSetup() {
                     updateBankingOperationBkg();
+                }
+
+                @Override
+                public void onTransferAccount() {
+                    hideFragment(mBankingOperationFragment);
+                    showFragment(mAccountListFragment);
                 }
             };
 

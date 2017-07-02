@@ -23,6 +23,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
 import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
@@ -35,6 +36,7 @@ import me.li2.android.fiserv.smartmoney.widget.SimpleDividerItemDecoration;
 
 public class BankingOperationFragment extends Fragment {
     private static final String TAG = "BankingOperation";
+    private static final String ARG_KEY_ACCOUNT_ITEM = "ArgKeyAccountItem";
     private static final int LAYOUT_COLUMNS_NUMBER = 3;
     private static final int LAYOUT_ROWS_NUMBER = 3;
 
@@ -58,17 +60,34 @@ public class BankingOperationFragment extends Fragment {
 
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
     @BindView(R.id.account_info_view) View mAccountInfoView;
-    private AccountItemViewHolder mAccountItemViewHolder;
+    @OnClick(R.id.account_transfer_btn)
+    public void transferAccount() {
+        if (mOnBankingOperationSelectListener != null) {
+            mOnBankingOperationSelectListener.onTransferAccount();
+        }
+    }
 
+    private AccountItemViewHolder mAccountItemViewHolder;
+    private AccountItem mAccountItem;
     private BankingOperationAdapter mAdapter;
     private OnBankingOperationSelectListener mOnBankingOperationSelectListener;
 
     public BankingOperationFragment() {
     }
 
+    public static BankingOperationFragment newInstance(AccountItem accountItem) {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_KEY_ACCOUNT_ITEM, accountItem);
+
+        BankingOperationFragment fragment = new BankingOperationFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public interface OnBankingOperationSelectListener {
         void onBankingOperationSelect(@BankingOperation int operation);
         void onRecyclerViewSetup();
+        void onTransferAccount();
     }
 
     public void setOnBankingOperationSelectListener(OnBankingOperationSelectListener l) {
@@ -78,6 +97,10 @@ public class BankingOperationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT_ITEM);
+        }
         setRetainInstance(true);
     }
 
@@ -136,6 +159,7 @@ public class BankingOperationFragment extends Fragment {
         //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
         //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.view_account_item, parent, false);
         mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null);
+        mAccountItemViewHolder.bindAccountItem(mAccountItem, 0);
     }
 
     public void updateAccountItemView(AccountItem accountItem) {

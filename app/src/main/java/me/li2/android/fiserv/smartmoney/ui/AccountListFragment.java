@@ -63,16 +63,12 @@ public class AccountListFragment extends Fragment {
     private ArrayList<AccountItem> createItems() {
         ArrayList<AccountItem> items = new ArrayList<>();
         items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
+        items.add(new AccountItem("http://i.imgur.com/0E2tgV7.jpg", "Checking Account", 1234567891, 1.29f));
+        items.add(new AccountItem("http://i.imgur.com/P5JLfjk.jpg", "Saving Account", 1234567892, 45.34f));
+        items.add(new AccountItem("http://i.imgur.com/nz67a4F.jpg", "Genius Credit Card", 1234567893, 52.49f));
+        items.add(new AccountItem("http://i.imgur.com/dFH34N5.jpg", "Student Loan", 1234567894, 35.98f));
+        items.add(new AccountItem("http://i.imgur.com/FI49ftb.jpg", "Credit Card", 1234567895, 0.13f));
+        items.add(new AccountItem("http://i.imgur.com/DNKnbG8.jpg", "New Zealand", 1234567896, 5.46f));
         return items;
     }
 

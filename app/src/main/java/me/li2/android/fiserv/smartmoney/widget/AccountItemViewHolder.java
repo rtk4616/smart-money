@@ -25,10 +25,6 @@ public class AccountItemViewHolder extends RecyclerView.ViewHolder implements Vi
         void onAccountSelect(AccountItem accountItem);
     }
 
-    public void setOnAccountSelectListener(OnAccountSelectListener l) {
-        mOnAccountSelectListener = l;
-    }
-
     private Context mContext;
     private AccountItem mItem;
     private OnAccountSelectListener mOnAccountSelectListener;
@@ -59,8 +55,8 @@ public class AccountItemViewHolder extends RecyclerView.ViewHolder implements Vi
         Picasso.with(mContext)
                 .load(item.avatarUrl)
                 .transform(new CropCircleTransformation())
-                .placeholder(R.drawable.i_banking_insights) // TODO Transformations cannot apply on placeholder and error images, and make sure ImageView width == height
-                .error(R.drawable.i_banking_insights)
+                .placeholder(R.mipmap.ic_launcher) // TODO Transformations cannot apply on placeholder and error images, and make sure ImageView width == height
+                .error(R.mipmap.ic_launcher)
                 .into(mAvatorView);
     }
 

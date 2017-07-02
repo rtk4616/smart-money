@@ -49,9 +49,9 @@
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
         android:background="@color/widget_background"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+        app:layout_constraintBottom_toBottomOf="@+id/account_transfer_btn"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/imageView2"
+        app:layout_constraintRight_toRightOf="@+id/account_transfer_btn"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -103,7 +103,7 @@
 
 
     <Button
-        android:id="@+id/imageView2"
+        android:id="@+id/account_transfer_btn"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:layout_marginBottom="32dp"
