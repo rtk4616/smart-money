@@ -3,6 +3,8 @@ package me.li2.android.fiserv.smartmoney.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * name:     Checking AccountItem
  * id:       1000234268
@@ -12,9 +14,13 @@ import android.os.Parcelable;
  * https://github.com/li2
  */
 public class AccountItem implements Parcelable{
+    @SerializedName("avatar_url")
     public String avatarUrl;
+    @SerializedName("name")
     public String name;
+    @SerializedName("id")
     public long id;
+    @SerializedName("balance")
     public double balance;
 
     public AccountItem(String avatarUrl, String name, long id, double balance) {
