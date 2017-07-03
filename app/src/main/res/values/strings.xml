@@ -22,4 +22,7 @@
     <string name="banking_operation_offers">Offers</string>
     <string name="banking_operation_wallet">Wallet</string>
 
+    <string name="details">Details</string>
+    <string name="connect">Connect</string>
+
 </resources>
