@@ -9,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
-
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -30,7 +28,6 @@ public class AccountListFragment extends Fragment {
     private static final String ARG_KEY_ACCOUNT_LIST = "arg_key_account_list";
 
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
-    private KProgressHUD mLoadingView;
 
     private AccountListAdapter mAdapter;
     private OnAccountSelectListener mOnAccountSelectListener;
@@ -39,7 +36,7 @@ public class AccountListFragment extends Fragment {
     public AccountListFragment() {
     }
 
-    public AccountListFragment newInstance(ArrayList<AccountItem> accounts) {
+    public static AccountListFragment newInstance(ArrayList<AccountItem> accounts) {
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_KEY_ACCOUNT_LIST, accounts);
 
@@ -58,8 +55,6 @@ public class AccountListFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             mAccounts = args.getParcelableArrayList(ARG_KEY_ACCOUNT_LIST);
-        } else {
-            showLoadingView();
         }
         setRetainInstance(true);
     }
@@ -80,13 +75,6 @@ public class AccountListFragment extends Fragment {
         return view;
     }
 
-    private void showLoadingView () {
-        mLoadingView = KProgressHUD.create(getActivity())
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(getString(R.string.logging_in))
-                .show();
-    }
-
     @SuppressWarnings("unused")
     private ArrayList<AccountItem> createItems() {
         ArrayList<AccountItem> items = new ArrayList<>();
@@ -99,7 +87,6 @@ public class AccountListFragment extends Fragment {
         if (mAdapter != null && accounts != null) {
             mAccounts = accounts;
             mAdapter.notifyDataSetChanged();
-            mLoadingView.dismiss();
         }
     }
 

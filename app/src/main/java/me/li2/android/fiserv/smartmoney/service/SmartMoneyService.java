@@ -24,7 +24,7 @@ import retrofit2.Response;
 public class SmartMoneyService extends Service {
     private static final String TAG = "SmartMoneyService";
 
-    private ArrayList<AccountItem> mAccounts = new ArrayList<>();
+    public ArrayList<AccountItem> mAccounts = new ArrayList<>();
 
     public interface OnAccountsGetListener {
         void onAccountsGet(ArrayList<AccountItem> accounts);

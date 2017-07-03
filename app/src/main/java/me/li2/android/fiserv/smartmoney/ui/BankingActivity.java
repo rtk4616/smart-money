@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.kaopiz.kprogresshud.KProgressHUD;
+
 import java.util.ArrayList;
 
 import me.li2.android.fiserv.smartmoney.R;
@@ -38,6 +40,7 @@ public class BankingActivity extends AppCompatActivity
     private SmartMoneyService mSmartMoneyService;
     private AccountListFragment mAccountListFragment;
     private BankingOperationFragment mBankingOperationFragment;
+    private KProgressHUD mLoadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +60,7 @@ public class BankingActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setupAccountListFragment();
-
+        showLoadingView();
         attachService();
     }
 
@@ -155,6 +157,38 @@ public class BankingActivity extends AppCompatActivity
         getAccounts();
     }
 
+    private void getAccounts() {
+        if (mSmartMoneyService == null) {
+            return;
+        }
+        mSmartMoneyService.getAccounts(new SmartMoneyService.OnAccountsGetListener() {
+            @Override
+            public void onAccountsGet(ArrayList<AccountItem> accounts) {
+                if (accounts != null && accounts.size() > 0) {
+                    hideLoadingView();
+                    setupBankingOperationFragment(accounts.get(0), accounts.size());
+                } else {
+                    Log.e(TAG, "failed to get accounts");
+                }
+            }
+        });
+    }
+
+
+    //-------- UI Part ------------------------------------------------------------------
+
+    private void showLoadingView () {
+        mLoadingView = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel(getString(R.string.logging_in))
+                .show();
+    }
+
+    private void hideLoadingView() {
+        if (mLoadingView != null) {
+            mLoadingView.dismiss();
+        }
+    }
 
     private void showFragment(Fragment fragment) {
         if (fragment != null) {
@@ -176,12 +210,12 @@ public class BankingActivity extends AppCompatActivity
 
     //-------- AccountListFragment ------------------------------------------------------
 
-    private void setupAccountListFragment() {
+    private void setupAccountListFragment(ArrayList<AccountItem> accounts) {
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment  = fm.findFragmentById(R.id.fragment_account_list_container);
 
         if (fragment == null) {
-            fragment = new AccountListFragment();
+            fragment = AccountListFragment.newInstance(accounts);
             fm.beginTransaction().add(R.id.fragment_account_list_container, fragment).commit();
             fm.executePendingTransactions();
         }
@@ -194,41 +228,19 @@ public class BankingActivity extends AppCompatActivity
                 @Override
                 public void onAccountSelect(AccountItem accountItem) {
                     Log.d(TAG, "Select account " + accountItem.name);
-                    if (mBankingOperationFragment == null) {
-                        setupBankingOperationFragment(accountItem);
-                    } else {
-                        showFragment(mBankingOperationFragment);
-                        mBankingOperationFragment.updateAccountItemView(accountItem);
-                    }
-                    hideFragment(mAccountListFragment);
+                    // TODO show Transaction list
                 }
             };
 
-    private void getAccounts() {
-        if (mSmartMoneyService == null) {
-            return;
-        }
-        mSmartMoneyService.getAccounts(new SmartMoneyService.OnAccountsGetListener() {
-            @Override
-            public void onAccountsGet(ArrayList<AccountItem> accounts) {
-                if (accounts != null && accounts.size() > 0) {
-                    mAccountListFragment.update(accounts);
-                } else {
-
-                }
-            }
-        });
-    }
-
     //-------- BankingOperationFragment -------------------------------------------------
 
-    private void setupBankingOperationFragment(AccountItem accountItem) {
+    private void setupBankingOperationFragment(AccountItem accountItem, int accountNumber) {
         // NOTE21: add fragment programmatically, instead of inflated in the layout.
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment  = fm.findFragmentById(R.id.fragment_banking_operation_container);
 
         if (fragment == null) {
-            fragment = BankingOperationFragment.newInstance(accountItem);
+            fragment = BankingOperationFragment.newInstance(accountItem, accountNumber);
             fm.beginTransaction().add(R.id.fragment_banking_operation_container, fragment).commit();
             fm.executePendingTransactions();
         }
@@ -279,7 +291,11 @@ public class BankingActivity extends AppCompatActivity
                 @Override
                 public void onTransferAccount() {
                     hideFragment(mBankingOperationFragment);
-                    showFragment(mAccountListFragment);
+                    if (mAccountListFragment == null) {
+                        setupAccountListFragment(mSmartMoneyService.mAccounts);
+                    } else {
+                        showFragment(mAccountListFragment);
+                    }
                 }
             };
 

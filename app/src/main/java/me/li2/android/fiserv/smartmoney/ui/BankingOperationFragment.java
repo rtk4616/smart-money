@@ -37,6 +37,7 @@ import me.li2.android.fiserv.smartmoney.widget.SimpleDividerItemDecoration;
 public class BankingOperationFragment extends Fragment {
     private static final String TAG = "BankingOperation";
     private static final String ARG_KEY_ACCOUNT_ITEM = "ArgKeyAccountItem";
+    private static final String ARG_KEY_ACCOUNT_NUMBER = "ArgKeyAccountNumber";
     private static final int LAYOUT_COLUMNS_NUMBER = 3;
     private static final int LAYOUT_ROWS_NUMBER = 3;
 
@@ -58,6 +59,7 @@ public class BankingOperationFragment extends Fragment {
     public static final int BANKING_OPERATION_OFFERS = 7;
     public static final int BANKING_OPERATION_WALLET = 8;
 
+    @BindView(R.id.account_number_view) TextView mAccountNumberView;
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
     @BindView(R.id.account_info_view) View mAccountInfoView;
     @OnClick(R.id.account_transfer_btn)
@@ -69,15 +71,17 @@ public class BankingOperationFragment extends Fragment {
 
     private AccountItemViewHolder mAccountItemViewHolder;
     private AccountItem mAccountItem;
+    private int mAccountNumber;
     private BankingOperationAdapter mAdapter;
     private OnBankingOperationSelectListener mOnBankingOperationSelectListener;
 
     public BankingOperationFragment() {
     }
 
-    public static BankingOperationFragment newInstance(AccountItem accountItem) {
+    public static BankingOperationFragment newInstance(AccountItem accountItem, int accountNumber) {
         Bundle args = new Bundle();
         args.putParcelable(ARG_KEY_ACCOUNT_ITEM, accountItem);
+        args.putInt(ARG_KEY_ACCOUNT_NUMBER, accountNumber);
 
         BankingOperationFragment fragment = new BankingOperationFragment();
         fragment.setArguments(args);
@@ -100,6 +104,7 @@ public class BankingOperationFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT_ITEM);
+            mAccountNumber = args.getInt(ARG_KEY_ACCOUNT_NUMBER, 0);
         }
         setRetainInstance(true);
     }
@@ -129,6 +134,7 @@ public class BankingOperationFragment extends Fragment {
             }
         });
 
+        mAccountNumberView.setText("" + mAccountNumber);
         createAccountItemViewHolder();
         return view;
     }
