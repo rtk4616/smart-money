@@ -24,4 +24,6 @@
     <style name="TextAppearance.ListItem.Medium" parent="@android:style/TextAppearance.Holo.Medium"/> <!-- 18sp -->
     <style name="TextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Holo.Small"/> <!-- 14sp -->
 
+    <style name="commonListItemStyle">
+    </style>
 </resources>

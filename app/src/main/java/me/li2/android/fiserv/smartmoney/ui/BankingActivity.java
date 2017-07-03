@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -190,6 +191,16 @@ public class BankingActivity extends AppCompatActivity
         }
     }
 
+    private Fragment findFragment(@IdRes int containerViewId) {
+        return getSupportFragmentManager().findFragmentById(containerViewId);
+    }
+
+    private void addFragment(@IdRes int containerViewId, Fragment fragment) {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().add(containerViewId, fragment).commit();
+        fm.executePendingTransactions();
+    }
+
     private void showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
@@ -211,13 +222,11 @@ public class BankingActivity extends AppCompatActivity
     //-------- AccountListFragment ------------------------------------------------------
 
     private void setupAccountListFragment(ArrayList<AccountItem> accounts) {
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment  = fm.findFragmentById(R.id.fragment_account_list_container);
-
+        final @IdRes int containerViewId = R.id.fragment_account_list_container;
+        Fragment fragment  = findFragment(containerViewId);
         if (fragment == null) {
             fragment = AccountListFragment.newInstance(accounts);
-            fm.beginTransaction().add(R.id.fragment_account_list_container, fragment).commit();
-            fm.executePendingTransactions();
+            addFragment(containerViewId, fragment);
         }
         mAccountListFragment = (AccountListFragment) fragment;
         mAccountListFragment.setOnAccountSelectListener(mOnAccountSelectListener);
@@ -236,13 +245,11 @@ public class BankingActivity extends AppCompatActivity
 
     private void setupBankingOperationFragment(AccountItem accountItem, int accountNumber) {
         // NOTE21: add fragment programmatically, instead of inflated in the layout.
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment  = fm.findFragmentById(R.id.fragment_banking_operation_container);
-
+        final @IdRes int containerViewId = R.id.fragment_banking_operation_container;
+        Fragment fragment  = findFragment(containerViewId);
         if (fragment == null) {
             fragment = BankingOperationFragment.newInstance(accountItem, accountNumber);
-            fm.beginTransaction().add(R.id.fragment_banking_operation_container, fragment).commit();
-            fm.executePendingTransactions();
+            addFragment(containerViewId, fragment);
         }
         mBankingOperationFragment = (BankingOperationFragment) fragment;
         mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
