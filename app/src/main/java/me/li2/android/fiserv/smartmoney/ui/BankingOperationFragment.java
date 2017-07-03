@@ -157,7 +157,7 @@ public class BankingOperationFragment extends Fragment {
 
     private void createAccountItemViewHolder() {
         //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
-        //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.view_account_item, parent, false);
+        //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.widget_account_item_view, parent, false);
         mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null);
         mAccountItemViewHolder.bindAccountItem(mAccountItem, 0);
     }
