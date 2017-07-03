@@ -6,10 +6,10 @@
     <color name="line_divider_color">@color/light_grey</color>
     <color name="light_grey">#D3D3D3</color>
     <!-- built-in tool to adjust color and alpha/opacity value, no need to set background alpha -->
-    <color name="widget_background">#9af1fbee</color>
+    <color name="widget_background">#6cf1fbee</color>
     <color name="transaction_operation_panel_bkg">#FE7122</color>
     
-    <color name="bg_item_normal_state">#fff0f0f0</color>
-    <color name="bg_item_swiping_state">#ffddddff</color>
-    <color name="bg_item_swiping_active_state">#ff9999ff</color>
+    <color name="bg_item_normal_state">@color/widget_background</color>
+    <color name="bg_item_swiping_state">@color/widget_background</color>
+    <color name="bg_item_swiping_active_state">@color/widget_background</color>
 </resources>

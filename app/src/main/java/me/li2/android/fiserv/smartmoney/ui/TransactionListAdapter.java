@@ -29,6 +29,7 @@ import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstant
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDefault;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionMoveToSwipedDirection;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.annotation.SwipeableItemResults;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.h6ah4i.android.widget.advrecyclerview.utils.RecyclerViewAdapterUtils;
 
@@ -69,12 +70,14 @@ public class TransactionListAdapter
         public ViewGroup mContainer;
         public TextView mTextView;
         public Button mButton;
+        public View mOperationPanelView;
 
         public MyViewHolder(View v) {
             super(v);
             mContainer = (ViewGroup) v.findViewById(R.id.transaction_item_container_view);
             mTextView = (TextView) v.findViewById(R.id.transaction_date_view);
             mButton = (Button) v.findViewById(R.id.transaction_detail_btn);
+            mOperationPanelView = v.findViewById(R.id.transaction_operation_panel_view);
         }
 
         @Override
@@ -82,6 +85,28 @@ public class TransactionListAdapter
             return mContainer;
         }
 
+        @Override
+        public void onSlideAmountUpdated(float horizontalAmount, float verticalAmount, boolean isSwiping) {
+            super.onSlideAmountUpdated(horizontalAmount, verticalAmount, isSwiping);
+            @SwipeableItemResults int result = getSwipeResult();
+
+            Log.d(TAG, "H amount " + horizontalAmount + ", " + isSwiping + ", result " + result);
+
+            // 往左滑动，负数增大 -0.004 到 -0.99， 到 0。透明度增大
+            // 往右滑动，负数减小，到0
+            // 因此可以用它的绝对值当做 alpha
+
+            float alpha = Math.abs(horizontalAmount);
+            mOperationPanelView.setAlpha(alpha);
+
+            if (!isSwiping) {
+                if (result == Swipeable.RESULT_SWIPED_LEFT) {
+                    mOperationPanelView.setAlpha(1);
+                } else if (result == Swipeable.RESULT_SWIPED_RIGHT || result == Swipeable.RESULT_CANCELED) {
+                    mOperationPanelView.setAlpha(0);
+                }
+            }
+        }
     }
 
     public TransactionListAdapter(AbstractDataProvider dataProvider) {
