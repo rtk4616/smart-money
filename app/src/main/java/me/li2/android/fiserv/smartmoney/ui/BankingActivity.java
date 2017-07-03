@@ -1,8 +1,10 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.IdRes;
@@ -20,10 +22,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
-
 import java.util.ArrayList;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
 import me.li2.android.fiserv.smartmoney.service.SmartMoneyService;
@@ -41,7 +43,8 @@ public class BankingActivity extends AppCompatActivity
     private SmartMoneyService mSmartMoneyService;
     private AccountListFragment mAccountListFragment;
     private BankingOperationFragment mBankingOperationFragment;
-    private KProgressHUD mLoadingView;
+    private TransactionListFragment mTransactionListFragment;
+    private Dialog mLoadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,10 +182,12 @@ public class BankingActivity extends AppCompatActivity
     //-------- UI Part ------------------------------------------------------------------
 
     private void showLoadingView () {
-        mLoadingView = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(getString(R.string.logging_in))
-                .show();
+        mLoadingView = new ACProgressFlower.Builder(this)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
+                .text(getString(R.string.logging_in))
+                .build();
+        mLoadingView.show();
     }
 
     private void hideLoadingView() {
@@ -204,7 +209,7 @@ public class BankingActivity extends AppCompatActivity
     private void showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .setCustomAnimations(android.R.anim.slide_in_left, -1)
+                    //.setCustomAnimations(android.R.anim.slide_in_left, -1)
                     .show(fragment)
                     .commit();
         }
@@ -213,7 +218,7 @@ public class BankingActivity extends AppCompatActivity
     private void hideFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .setCustomAnimations(-1, android.R.anim.slide_out_right)
+                    //.setCustomAnimations(-1, android.R.anim.slide_out_right)
                     .hide(fragment)
                     .commit();
         }
@@ -237,7 +242,12 @@ public class BankingActivity extends AppCompatActivity
                 @Override
                 public void onAccountSelect(AccountItem accountItem) {
                     Log.d(TAG, "Select account " + accountItem.name);
-                    // TODO show Transaction list
+                    hideFragment(mAccountListFragment);
+                    if (mTransactionListFragment != null) {
+                        showFragment(mTransactionListFragment);
+                    } else {
+                        setupTransactionListFragment();
+                    }
                 }
             };
 
@@ -292,7 +302,7 @@ public class BankingActivity extends AppCompatActivity
 
                 @Override
                 public void onRecyclerViewSetup() {
-                    updateBankingOperationBkg();
+                    //updateBankingOperationBkg();
                 }
 
                 @Override
@@ -316,5 +326,18 @@ public class BankingActivity extends AppCompatActivity
         mBankingOperationFragment.updateItem(
                 BankingOperationFragment.BANKING_OPERATION_WALLET,
                 ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
+    }
+
+
+    //-------- TransactionListFragment -------------------------------------------------
+
+    private void setupTransactionListFragment() {
+        final @IdRes int containerViewId = R.id.fragment_transaction_list_container;
+        Fragment fragment  = findFragment(containerViewId);
+        if (fragment == null) {
+            fragment = new TransactionListFragment();
+            addFragment(containerViewId, fragment);
+        }
+        mTransactionListFragment = (TransactionListFragment) fragment;
     }
 }
