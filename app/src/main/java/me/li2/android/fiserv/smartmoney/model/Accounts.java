@@ -2,7 +2,7 @@ package me.li2.android.fiserv.smartmoney.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by weiyi on 03/07/2017.
@@ -17,5 +17,5 @@ public class Accounts {
     @SerializedName("user_name")
     public String userName;
     @SerializedName("accounts")
-    public List<AccountItem> accounts;
+    public ArrayList<AccountItem> accounts;
 }

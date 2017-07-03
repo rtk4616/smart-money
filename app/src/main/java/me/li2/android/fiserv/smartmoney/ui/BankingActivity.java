@@ -1,6 +1,10 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +19,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.service.SmartMoneyService;
 import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
 
 /**
@@ -28,6 +35,7 @@ public class BankingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "BankingActivity";
+    private SmartMoneyService mSmartMoneyService;
     private AccountListFragment mAccountListFragment;
     private BankingOperationFragment mBankingOperationFragment;
 
@@ -50,6 +58,14 @@ public class BankingActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setupAccountListFragment();
+
+        attachService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detachService();
     }
 
     @Override
@@ -110,6 +126,36 @@ public class BankingActivity extends AppCompatActivity
     }
 
 
+    //-------- Service ------------------------------------------------------------------
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            SmartMoneyService.SmartMoneyServiceBinder binder = (SmartMoneyService.SmartMoneyServiceBinder) service;
+            mSmartMoneyService = binder.getService();
+            onServiceAttached(mSmartMoneyService);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mSmartMoneyService = null;
+        }
+    };
+
+    private void attachService() {
+        Intent intent = new Intent(this, SmartMoneyService.class);
+        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void detachService() {
+        unbindService(mServiceConnection);
+    }
+
+    private void onServiceAttached(SmartMoneyService service) {
+        getAccounts();
+    }
+
+
     private void showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
@@ -158,6 +204,21 @@ public class BankingActivity extends AppCompatActivity
                 }
             };
 
+    private void getAccounts() {
+        if (mSmartMoneyService == null) {
+            return;
+        }
+        mSmartMoneyService.getAccounts(new SmartMoneyService.OnAccountsGetListener() {
+            @Override
+            public void onAccountsGet(ArrayList<AccountItem> accounts) {
+                if (accounts != null && accounts.size() > 0) {
+                    mAccountListFragment.update(accounts);
+                } else {
+
+                }
+            }
+        });
+    }
 
     //-------- BankingOperationFragment -------------------------------------------------
 
