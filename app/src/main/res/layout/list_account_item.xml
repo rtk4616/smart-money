@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/account_avator_view"
-            android:layout_width="@dimen/account_icon_size"
-            android:layout_height="@dimen/account_icon_size"
+            android:layout_width="@dimen/avator_icon_size"
+            android:layout_height="@dimen/avator_icon_size"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"

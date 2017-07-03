@@ -24,5 +24,6 @@
 
     <string name="details">Details</string>
     <string name="connect">Connect</string>
+    <string name="available_credit">Available Credit</string>
 
 </resources>

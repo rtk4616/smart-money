@@ -9,11 +9,10 @@
     <!-- general -->
     <dimen name="general_layout_margin">8dp</dimen>
     <dimen name="list_item_elevation">2dp</dimen>
-    <dimen name="list_item_icon_size">36dp</dimen>
-    <dimen name="transaction_list_item_size">80dp</dimen>
+    <dimen name="list_item_icon_size">24dp</dimen>
+    <dimen name="avator_icon_size">80dp</dimen>
 
-    <!-- account list item -->
-    <dimen name="account_icon_size">80dp</dimen>
+    <dimen name="transaction_list_item_size">80dp</dimen>
 
     <!-- banking operation list item -->
     <dimen name="banking_operation_icon_size">36dp</dimen>
