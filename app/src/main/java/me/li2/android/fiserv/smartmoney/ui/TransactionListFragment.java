@@ -16,6 +16,8 @@
 
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Bundle;
@@ -40,6 +42,7 @@ import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchAct
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -223,7 +226,19 @@ public class TransactionListFragment extends Fragment {
         mAccountAvailableCreditView.setText(ViewUtils.moneyAmountFormat(getContext(), accountItem.availableCredit));
     }
 
+    private Dialog mLoadingDialog;
+
+    private void hideLoadingView() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
+            mLoadingDialog = null;
+        }
+    }
+
     private void loadTransactions() {
+        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(getActivity()),
+                getString(R.string.loading_transactions));
+
         FiservService service = ServiceGenerator.createService(FiservService.class);
         service.getTransactions().enqueue(new Callback<Transactions>() {
             @Override
@@ -236,11 +251,12 @@ public class TransactionListFragment extends Fragment {
                     item.id = id++; // NOTE21 swipeable feature needs unique id.
                 }
                 mTransactionListAdapter.updateTransactionItems(items);
+                hideLoadingView();
             }
 
             @Override
             public void onFailure(Call<Transactions> call, Throwable t) {
-
+                hideLoadingView();
             }
         });
     }

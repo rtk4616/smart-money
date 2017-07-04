@@ -7,11 +7,11 @@
     <string name="action_settings">Settings</string>
 
     <string name="logging_in">Securely logging in...</string>
-
     <string name="accounts">Accounts</string>
     <string name="account_balance_format">$%.2f</string>
     <string name="transfer_between_accounts">Transfer between accounts</string>
-    
+    <string name="loading_transactions">Loading transactions...</string>
+
     <string name="banking_operation_pay_merchant">Pay a\nmerchant</string>
     <string name="banking_operation_pay_bill">Pay a\nbill</string>
     <string name="banking_operation_pay_company">Pay a\ncompany</string>

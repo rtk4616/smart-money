@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -114,6 +115,10 @@ public class BankingOperationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_banking_operation, container, false);
         ButterKnife.bind(this, view);
 
+        //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
+        //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.widget_account_item_view, parent, false);
+        mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null);
+
         final RecyclerView recyclerView = mRecyclerView;
         GridLayoutManager layoutManager = new GridLayoutManager(
                 getActivity(), LAYOUT_COLUMNS_NUMBER, GridLayoutManager.VERTICAL, false);
@@ -126,7 +131,7 @@ public class BankingOperationFragment extends Fragment {
             public void onGlobalLayout() {
                 Log.d(TAG, "RecyclerView height is ready " + recyclerView.getMeasuredHeight());
                 recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                mAdapter = new BankingOperationAdapter(getActivity(), createItems(), recyclerView.getMeasuredHeight());
+                mAdapter = new BankingOperationAdapter(getActivity(), createOperationItems(), recyclerView.getMeasuredHeight());
                 recyclerView.setAdapter(mAdapter);
                 if (mOnBankingOperationSelectListener != null) {
                     mOnBankingOperationSelectListener.onRecyclerViewSetup();
@@ -134,46 +139,21 @@ public class BankingOperationFragment extends Fragment {
             }
         });
 
-        mAccountNumberView.setText("" + mAccountNumber);
-        createAccountItemViewHolder();
         return view;
     }
 
-    private ArrayList<BankingOperationItem> createItems() {
-        ArrayList<BankingOperationItem> items  = new ArrayList<>();
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_MERCHANT, R.drawable.i_banking_pay_merchant, R.string.banking_operation_pay_merchant));
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_BILL, R.drawable.i_banking_pay_bill, R.string.banking_operation_pay_bill));
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_COMPANY, R.drawable.i_banking_pay_company, R.string.banking_operation_pay_company));
-        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_PERSON, R.drawable.i_banking_pay_person, R.string.banking_operation_pay_person));
-        items.add(new BankingOperationItem(BANKING_OPERATION_REQUEST_MONEY, R.drawable.i_banking_request_money, R.string.banking_operation_request_money));
-        items.add(new BankingOperationItem(BANKING_OPERATION_DEPOSIT_CHECK, R.drawable.i_banking_deposit_check, R.string.banking_operation_deposit_check));
-        items.add(new BankingOperationItem(BANKING_OPERATION_INSIGHTS, -1, R.string.banking_operation_insights));
-        items.add(new BankingOperationItem(BANKING_OPERATION_OFFERS, -1, R.string.banking_operation_offers));
-        items.add(new BankingOperationItem(BANKING_OPERATION_WALLET, -1, R.string.banking_operation_wallet));
-        return items;
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        updateAccountView(mAccountNumber, mAccountItem);
     }
 
-    public void updateItem(@BankingOperation int operation, Drawable background) {
-        if (mAdapter != null) {
-            mAdapter.updateItem(operation, background);
-        }
-    }
-
-    //-------- Account View Holder ------------------------------------------------------
-
-    private void createAccountItemViewHolder() {
-        //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
-        //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.widget_account_item_view, parent, false);
-        mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null);
-        mAccountItemViewHolder.bindAccountItem(mAccountItem, 0);
-    }
-
-    public void updateAccountItemView(AccountItem accountItem) {
+    public void updateAccountView(int accountNumber, AccountItem accountItem) {
+        mAccountNumberView.setText("" + accountNumber);
         if (mAccountItemViewHolder != null) {
             mAccountItemViewHolder.bindAccountItem(accountItem, 0);
         }
     }
-
 
     //-------- BankingOperationItem -----------------------------------------------------
 
@@ -187,6 +167,26 @@ public class BankingOperationFragment extends Fragment {
             this.operation = operation;
             this.iconId = iconId;
             this.titleId = titleId;
+        }
+    }
+
+    private ArrayList<BankingOperationItem> createOperationItems() {
+        ArrayList<BankingOperationItem> items  = new ArrayList<>();
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_MERCHANT, R.drawable.i_banking_pay_merchant, R.string.banking_operation_pay_merchant));
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_BILL, R.drawable.i_banking_pay_bill, R.string.banking_operation_pay_bill));
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_COMPANY, R.drawable.i_banking_pay_company, R.string.banking_operation_pay_company));
+        items.add(new BankingOperationItem(BANKING_OPERATION_PAY_PERSON, R.drawable.i_banking_pay_person, R.string.banking_operation_pay_person));
+        items.add(new BankingOperationItem(BANKING_OPERATION_REQUEST_MONEY, R.drawable.i_banking_request_money, R.string.banking_operation_request_money));
+        items.add(new BankingOperationItem(BANKING_OPERATION_DEPOSIT_CHECK, R.drawable.i_banking_deposit_check, R.string.banking_operation_deposit_check));
+        items.add(new BankingOperationItem(BANKING_OPERATION_INSIGHTS, -1, R.string.banking_operation_insights));
+        items.add(new BankingOperationItem(BANKING_OPERATION_OFFERS, -1, R.string.banking_operation_offers));
+        items.add(new BankingOperationItem(BANKING_OPERATION_WALLET, -1, R.string.banking_operation_wallet));
+        return items;
+    }
+
+    public void updateOperationItem(@BankingOperation int operation, Drawable background) {
+        if (mAdapter != null) {
+            mAdapter.updateItem(operation, background);
         }
     }
 

@@ -1,10 +1,10 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.IdRes;
@@ -22,14 +22,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import cc.cloudist.acplibrary.ACProgressConstant;
-import cc.cloudist.acplibrary.ACProgressFlower;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.model.Accounts;
 import me.li2.android.fiserv.smartmoney.service.SmartMoneyService;
+import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
+import me.li2.android.fiserv.smartmoney.webservice.FiservService;
+import me.li2.android.fiserv.smartmoney.webservice.ServiceGenerator;
 import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by weiyi on 01/07/2017.
@@ -41,10 +47,10 @@ public class BankingActivity extends AppCompatActivity
 
     private static final String TAG = "BankingActivity";
     private SmartMoneyService mSmartMoneyService;
+    private ArrayList<AccountItem> mAccountItems;
     private AccountListFragment mAccountListFragment;
     private BankingOperationFragment mBankingOperationFragment;
     private TransactionListFragment mTransactionListFragment;
-    private Dialog mLoadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +70,8 @@ public class BankingActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        showLoadingView();
         attachService();
+        loadingAccounts();
     }
 
     @Override
@@ -132,6 +138,39 @@ public class BankingActivity extends AppCompatActivity
     }
 
 
+    //-------- Loading Accounts ---------------------------------------------------------
+
+    private void loadingAccounts() {
+        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(this),
+                getString(R.string.loading_transactions));
+
+        FiservService service = ServiceGenerator.createService(FiservService.class);
+        service.getAccounts().enqueue(new Callback<Accounts>() {
+            @Override
+            public void onResponse(Call<Accounts> call, Response<Accounts> response) {
+                mAccountItems = response.body().accounts;
+                setupBankingOperationFragment(mAccountItems.get(0), mAccountItems.size());
+                hideLoadingView();
+            }
+
+            @Override
+            public void onFailure(Call<Accounts> call, Throwable t) {
+                Log.e(TAG, "failed to get accounts");
+                hideLoadingView();
+            }
+        });
+    }
+
+    private Dialog mLoadingDialog;
+
+    private void hideLoadingView() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
+            mLoadingDialog = null;
+        }
+    }
+
+
     //-------- Service ------------------------------------------------------------------
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -158,43 +197,10 @@ public class BankingActivity extends AppCompatActivity
     }
 
     private void onServiceAttached(SmartMoneyService service) {
-        getAccounts();
-    }
-
-    private void getAccounts() {
-        if (mSmartMoneyService == null) {
-            return;
-        }
-        mSmartMoneyService.getAccounts(new SmartMoneyService.OnAccountsGetListener() {
-            @Override
-            public void onAccountsGet(ArrayList<AccountItem> accounts) {
-                if (accounts != null && accounts.size() > 0) {
-                    hideLoadingView();
-                    setupBankingOperationFragment(accounts.get(0), accounts.size());
-                } else {
-                    Log.e(TAG, "failed to get accounts");
-                }
-            }
-        });
     }
 
 
     //-------- UI Part ------------------------------------------------------------------
-
-    private void showLoadingView () {
-        mLoadingView = new ACProgressFlower.Builder(this)
-                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
-                .themeColor(Color.WHITE)
-                .text(getString(R.string.logging_in))
-                .build();
-        mLoadingView.show();
-    }
-
-    private void hideLoadingView() {
-        if (mLoadingView != null) {
-            mLoadingView.dismiss();
-        }
-    }
 
     private Fragment findFragment(@IdRes int containerViewId) {
         return getSupportFragmentManager().findFragmentById(containerViewId);
@@ -309,7 +315,7 @@ public class BankingActivity extends AppCompatActivity
                 public void onTransferAccount() {
                     hideFragment(mBankingOperationFragment);
                     if (mAccountListFragment == null) {
-                        setupAccountListFragment(mSmartMoneyService.mAccounts);
+                        setupAccountListFragment(mAccountItems);
                     } else {
                         showFragment(mAccountListFragment);
                     }
@@ -317,13 +323,13 @@ public class BankingActivity extends AppCompatActivity
             };
 
     private void updateBankingOperationBkg() {
-        mBankingOperationFragment.updateItem(
+        mBankingOperationFragment.updateOperationItem(
                 BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
                 ContextCompat.getDrawable(this, R.drawable.i_banking_insights));
-        mBankingOperationFragment.updateItem(
+        mBankingOperationFragment.updateOperationItem(
                 BankingOperationFragment.BANKING_OPERATION_OFFERS,
                 ContextCompat.getDrawable(this, R.drawable.i_banking_offers));
-        mBankingOperationFragment.updateItem(
+        mBankingOperationFragment.updateOperationItem(
                 BankingOperationFragment.BANKING_OPERATION_WALLET,
                 ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
     }

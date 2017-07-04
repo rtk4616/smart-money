@@ -16,15 +16,21 @@
 
 package me.li2.android.fiserv.smartmoney.utils;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 import me.li2.android.fiserv.smartmoney.R;
 
 public class ViewUtils {
@@ -73,5 +79,20 @@ public class ViewUtils {
             }
         }
         return result;
+    }
+
+    public static Dialog showLoadingDialog (WeakReference<Activity> ref, String label) {
+        Activity attachedActivity = ref.get();
+        if (attachedActivity != null) {
+            Dialog dialog = new ACProgressFlower.Builder(attachedActivity)
+                    .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                    .themeColor(Color.WHITE)
+                    .text(label)
+                    .isTextExpandWidth(true)
+                    .build();
+            dialog.show();
+            return dialog;
+        }
+        return null;
     }
 }
