@@ -18,7 +18,6 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,6 +27,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -37,10 +38,23 @@ import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDec
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
-import me.li2.android.fiserv.smartmoney.model.AbstractDataProvider;
-import me.li2.android.fiserv.smartmoney.model.ExampleDataProvider;
+import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.model.TransactionItem;
+import me.li2.android.fiserv.smartmoney.model.Transactions;
+import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
+import me.li2.android.fiserv.smartmoney.webservice.FiservService;
+import me.li2.android.fiserv.smartmoney.webservice.ServiceGenerator;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by weiyi on 03/07/2017.
@@ -50,20 +64,53 @@ import me.li2.android.fiserv.smartmoney.model.ExampleDataProvider;
  */
 
 public class TransactionListFragment extends Fragment {
-    private RecyclerView mRecyclerView;
+    private static final String TAG = "TransactionListFragment";
+    private static final String ARG_KEY_ACCOUNT_ITEM = "ArgKeyAccountItem";
+
+    private AccountItem mAccountItem;
     private RecyclerView.LayoutManager mLayoutManager;
+    private TransactionListAdapter mTransactionListAdapter;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewSwipeManager mRecyclerViewSwipeManager;
     private RecyclerViewTouchActionGuardManager mRecyclerViewTouchActionGuardManager;
 
+    // view widget
+    @BindView(R.id.account_avator_view) ImageView mAccountAvatorView;
+    @BindView(R.id.account_id_view) TextView mAccountIdView;
+    @BindView(R.id.account_balance_view) TextView mAccountBalanceView;
+    @BindView(R.id.account_name_view) TextView mAccountNameView;
+    @BindView(R.id.account_available_credit_view) TextView mAccountAvailableCreditView;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+
     public TransactionListFragment() {
         super();
     }
 
+    public static TransactionListFragment newInstance(AccountItem accountItem) {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_KEY_ACCOUNT_ITEM, accountItem);
+
+        TransactionListFragment fragment = new TransactionListFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT_ITEM);
+        }
+        setRetainInstance(true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_transaction_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_transaction_list, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -71,7 +118,6 @@ public class TransactionListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //noinspection ConstantConditions
-        mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
         mLayoutManager = new LinearLayoutManager(getContext());
 
         // touch guard manager  (this class is required to suppress scrolling while swipe-dismiss animation is running)
@@ -83,26 +129,10 @@ public class TransactionListFragment extends Fragment {
         mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
 
         //adapter
-        final TransactionListAdapter myItemAdapter = new TransactionListAdapter(getDataProvider());
-        myItemAdapter.setEventListener(new TransactionListAdapter.EventListener() {
-            @Override
-            public void onItemPinned(int position) {
-                Toast.makeText(getContext(), "onItemPinned", Toast.LENGTH_SHORT).show();;
-            }
+        final TransactionListAdapter myItemAdapter = new TransactionListAdapter();
 
-            @Override
-            public void onItemViewClicked(View v) {
-                handleOnItemViewClicked(v);
-            }
-
-            @Override
-            public void onUnderSwipeableViewButtonClicked(View v) {
-                handleOnUnderSwipeableViewButtonClicked(v);
-            }
-        });
-
+        mTransactionListAdapter = myItemAdapter;
         mAdapter = myItemAdapter;
-
         mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(myItemAdapter);      // wrap for swiping
 
         final GeneralItemAnimator animator = new SwipeDismissItemAnimator();
@@ -117,7 +147,7 @@ public class TransactionListFragment extends Fragment {
 
         // additional decorations
         //noinspection StatementWithEmptyBody
-        if (supportsViewElevation()) {
+        if (ViewUtils.supportsViewElevation()) {
             // Lollipop or later has native drop shadow feature. ItemShadowDecorator is not required.
         } else {
             mRecyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.line_divider)));
@@ -131,11 +161,7 @@ public class TransactionListFragment extends Fragment {
         mRecyclerViewTouchActionGuardManager.attachRecyclerView(mRecyclerView);
         mRecyclerViewSwipeManager.attachRecyclerView(mRecyclerView);
 
-        // for debugging
-//        animator.setDebug(true);
-//        animator.setMoveDuration(2000);
-//        mRecyclerViewSwipeManager.setMoveToOutsideWindowAnimationDuration(2000);
-//        mRecyclerViewSwipeManager.setReturnToDefaultPositionAnimationDuration(2000);
+        updateView();
     }
 
     @Override
@@ -161,6 +187,7 @@ public class TransactionListFragment extends Fragment {
             mWrappedAdapter = null;
         }
         mAdapter = null;
+        mTransactionListAdapter = null;
         mLayoutManager = null;
 
         super.onDestroyView();
@@ -181,20 +208,40 @@ public class TransactionListFragment extends Fragment {
         }
     }
 
-    private boolean supportsViewElevation() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    private void updateView() {
+        updateAccountItemView(mAccountItem);
+        loadTransactions();
     }
 
-    public AbstractDataProvider getDataProvider() {
-        return new ExampleDataProvider();
+    private void updateAccountItemView(AccountItem accountItem) {
+        Picasso.with(getContext())
+                .load(mAccountItem.avatarUrl)
+                .into(mAccountAvatorView);
+
+        mAccountIdView.setText("" + accountItem.id);
+        mAccountBalanceView.setText(ViewUtils.moneyAmountFormat(getContext(), accountItem.balance));
+        mAccountAvailableCreditView.setText(ViewUtils.moneyAmountFormat(getContext(), accountItem.availableCredit));
     }
 
-    public void notifyItemChanged(int position) {
-        mAdapter.notifyItemChanged(position);
-    }
+    private void loadTransactions() {
+        FiservService service = ServiceGenerator.createService(FiservService.class);
+        service.getTransactions().enqueue(new Callback<Transactions>() {
+            @Override
+            public void onResponse(Call<Transactions> call, Response<Transactions> response) {
+                ArrayList<TransactionItem> items = response.body().transactionItems;
+                Iterator<TransactionItem> iterator = items.iterator();
+                long id = 0;
+                while (iterator.hasNext()) {
+                    TransactionItem item = iterator.next();
+                    item.id = id++; // NOTE21 swipeable feature needs unique id.
+                }
+                mTransactionListAdapter.updateTransactionItems(items);
+            }
 
-    public void notifyItemInserted(int position) {
-        mAdapter.notifyItemInserted(position);
-        mRecyclerView.scrollToPosition(position);
+            @Override
+            public void onFailure(Call<Transactions> call, Throwable t) {
+
+            }
+        });
     }
 }

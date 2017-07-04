@@ -78,8 +78,8 @@ public class AccountListFragment extends Fragment {
     @SuppressWarnings("unused")
     private ArrayList<AccountItem> createItems() {
         ArrayList<AccountItem> items = new ArrayList<>();
-        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f));
-        items.add(new AccountItem("http://i.imgur.com/DNKnbG8.jpg", "New Zealand", 1234567896, 5.46f));
+        items.add(new AccountItem("http://i.imgur.com/9gbQ7YR.jpg", "Weiyi Li", 1234567890, 521.13f, 22.22f));
+        items.add(new AccountItem("http://i.imgur.com/DNKnbG8.jpg", "New Zealand", 1234567896, 5.46f, 11.11f));
         return items;
     }
 

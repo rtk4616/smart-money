@@ -246,7 +246,7 @@ public class BankingActivity extends AppCompatActivity
                     if (mTransactionListFragment != null) {
                         showFragment(mTransactionListFragment);
                     } else {
-                        setupTransactionListFragment();
+                        setupTransactionListFragment(accountItem);
                     }
                 }
             };
@@ -331,11 +331,11 @@ public class BankingActivity extends AppCompatActivity
 
     //-------- TransactionListFragment -------------------------------------------------
 
-    private void setupTransactionListFragment() {
+    private void setupTransactionListFragment(AccountItem accountItem) {
         final @IdRes int containerViewId = R.id.fragment_transaction_list_container;
         Fragment fragment  = findFragment(containerViewId);
         if (fragment == null) {
-            fragment = new TransactionListFragment();
+            fragment = TransactionListFragment.newInstance(accountItem);
             addFragment(containerViewId, fragment);
         }
         mTransactionListFragment = (TransactionListFragment) fragment;

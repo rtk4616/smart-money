@@ -21,21 +21,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDefault;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionMoveToSwipedDirection;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.annotation.SwipeableItemResults;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
-import com.h6ah4i.android.widget.advrecyclerview.utils.RecyclerViewAdapterUtils;
+
+import java.util.ArrayList;
 
 import me.li2.android.fiserv.smartmoney.R;
-import me.li2.android.fiserv.smartmoney.model.AbstractDataProvider;
+import me.li2.android.fiserv.smartmoney.model.TransactionItem;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
+import me.li2.android.fiserv.smartmoney.widget.TransactionItemViewHolder;
 
 /**
  * Created by weiyi on 03/07/2017.
@@ -45,172 +43,59 @@ import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
  */
 
 public class TransactionListAdapter
-        extends RecyclerView.Adapter<TransactionListAdapter.MyViewHolder>
-        implements SwipeableItemAdapter<TransactionListAdapter.MyViewHolder> {
+        extends RecyclerView.Adapter<TransactionItemViewHolder>
+        implements SwipeableItemAdapter<TransactionItemViewHolder> {
     private static final String TAG = "MySwipeableItemAdapter";
 
     // NOTE: Make accessible with short name
     private interface Swipeable extends SwipeableItemConstants {
     }
 
-    private AbstractDataProvider mProvider;
-    private EventListener mEventListener;
-    private View.OnClickListener mSwipeableViewContainerOnClickListener;
-    private View.OnClickListener mUnderSwipeableViewButtonOnClickListener;
+    private ArrayList<TransactionItem> mTransactionItems;
 
-    public interface EventListener {
-        void onItemPinned(int position);
-
-        void onItemViewClicked(View v);
-
-        void onUnderSwipeableViewButtonClicked(View v);
-    }
-
-    public static class MyViewHolder extends AbstractSwipeableItemViewHolder {
-        public ViewGroup mContainer;
-        public TextView mTextView;
-        public Button mButton;
-        public View mOperationPanelView;
-
-        public MyViewHolder(View v) {
-            super(v);
-            mContainer = (ViewGroup) v.findViewById(R.id.transaction_item_container_view);
-            mTextView = (TextView) v.findViewById(R.id.transaction_date_view);
-            mButton = (Button) v.findViewById(R.id.transaction_detail_btn);
-            mOperationPanelView = v.findViewById(R.id.transaction_operation_panel_view);
-        }
-
-        @Override
-        public View getSwipeableContainerView() {
-            return mContainer;
-        }
-
-        @Override
-        public void onSlideAmountUpdated(float horizontalAmount, float verticalAmount, boolean isSwiping) {
-            super.onSlideAmountUpdated(horizontalAmount, verticalAmount, isSwiping);
-            @SwipeableItemResults int result = getSwipeResult();
-
-            Log.d(TAG, "H amount " + horizontalAmount + ", " + isSwiping + ", result " + result);
-
-            // 往左滑动，负数增大 -0.004 到 -0.99， 到 0。透明度增大
-            // 往右滑动，负数减小，到0
-            // 因此可以用它的绝对值当做 alpha
-
-            float alpha = Math.abs(horizontalAmount);
-            mOperationPanelView.setAlpha(alpha);
-
-            if (!isSwiping) {
-                if (result == Swipeable.RESULT_SWIPED_LEFT) {
-                    mOperationPanelView.setAlpha(1);
-                } else if (result == Swipeable.RESULT_SWIPED_RIGHT || result == Swipeable.RESULT_CANCELED) {
-                    mOperationPanelView.setAlpha(0);
-                }
-            }
-        }
-    }
-
-    public TransactionListAdapter(AbstractDataProvider dataProvider) {
-        mProvider = dataProvider;
-        mSwipeableViewContainerOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSwipeableViewContainerClick(v);
-            }
-        };
-        mUnderSwipeableViewButtonOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onUnderSwipeableViewButtonClick(v);
-            }
-        };
-
+    public TransactionListAdapter() {
         // SwipeableItemAdapter requires stable ID, and also
         // have to implement the getItemId() method appropriately.
         setHasStableIds(true);
     }
 
-    private void onSwipeableViewContainerClick(View v) {
-        if (mEventListener != null) {
-            mEventListener.onItemViewClicked(
-                    RecyclerViewAdapterUtils.getParentViewHolderItemView(v));
-        }
+    public void updateTransactionItems(ArrayList<TransactionItem> items) {
+        mTransactionItems = items;
+        notifyDataSetChanged();
     }
 
-    private void onUnderSwipeableViewButtonClick(View v) {
-        if (mEventListener != null) {
-            mEventListener.onUnderSwipeableViewButtonClicked(
-                    RecyclerViewAdapterUtils.getParentViewHolderItemView(v));
+    public TransactionItem getItem(int position) {
+        if (position < getItemCount()) {
+            return mTransactionItems.get(position);
+        } else {
+            return null;
         }
     }
 
     @Override
     public long getItemId(int position) {
-        return mProvider.getItem(position).getId();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mProvider.getItem(position).getViewType();
-    }
-
-    @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final View v = inflater.inflate(R.layout.list_transaction_item, parent, false);
-        return new MyViewHolder(v);
-    }
-
-    @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        final AbstractDataProvider.Data item = mProvider.getItem(position);
-
-        // set listeners
-        // (if the item is *pinned*, click event comes to the mContainer)
-        holder.mContainer.setOnClickListener(mSwipeableViewContainerOnClickListener);
-        holder.mButton.setOnClickListener(mUnderSwipeableViewButtonOnClickListener);
-
-        // set text
-        holder.mTextView.setText(item.getText());
-
-        // set background resource (target view ID: container)
-        final int swipeState = holder.getSwipeStateFlags();
-
-        if ((swipeState & Swipeable.STATE_FLAG_IS_UPDATED) != 0) {
-            int bgResId = 0;
-
-            if ((swipeState & Swipeable.STATE_FLAG_IS_ACTIVE) != 0) {
-                bgResId = R.drawable.bg_item_swiping_active_state;
-            } else if ((swipeState & Swipeable.STATE_FLAG_SWIPING) != 0) {
-                bgResId = R.drawable.bg_item_swiping_state;
-            } else {
-                bgResId = R.drawable.bg_item_normal_state;
-            }
-
-            holder.mContainer.setBackgroundResource(bgResId);
-        }
-
-        // set swiping properties
-        holder.setMaxLeftSwipeAmount(-0.5f);
-        holder.setMaxRightSwipeAmount(0);
-        holder.setSwipeItemHorizontalSlideAmount(item.isPinned() ? -0.5f : 0);
-
-        // Or, it can be specified in pixels instead of proportional value.
-        // float density = holder.itemView.getResources().getDisplayMetrics().density;
-        // float pinnedDistance = (density * 100); // 100 dp
-
-        // holder.setProportionalSwipeAmountModeEnabled(false);
-        // holder.setMaxLeftSwipeAmount(-pinnedDistance);
-        // holder.setMaxRightSwipeAmount(0);
-        // holder.setSwipeItemHorizontalSlideAmount(item.isPinned() ? -pinnedDistance: 0);
+        return getItem(position).id;
     }
 
     @Override
     public int getItemCount() {
-        return mProvider.getCount();
+        return mTransactionItems != null ? mTransactionItems.size() : 0;
     }
 
     @Override
-    public int onGetSwipeReactionType(MyViewHolder holder, int position, int x, int y) {
+    public TransactionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final View v = inflater.inflate(R.layout.list_transaction_item, parent, false);
+        return new TransactionItemViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(TransactionItemViewHolder holder, int position) {
+        holder.bindTransactionItem(mTransactionItems.get(position));
+    }
+
+    @Override
+    public int onGetSwipeReactionType(TransactionItemViewHolder holder, int position, int x, int y) {
         if (ViewUtils.hitTest(holder.getSwipeableContainerView(), x, y)) {
             return Swipeable.REACTION_CAN_SWIPE_BOTH_H;
         } else {
@@ -219,7 +104,7 @@ public class TransactionListAdapter
     }
 
     @Override
-    public void onSetSwipeBackground(MyViewHolder holder, int position, int type) {
+    public void onSetSwipeBackground(TransactionItemViewHolder holder, int position, int type) {
         int bgRes = android.R.color.transparent;
         switch (type) {
             case Swipeable.DRAWABLE_SWIPE_NEUTRAL_BACKGROUND:
@@ -234,7 +119,7 @@ public class TransactionListAdapter
     }
 
     @Override
-    public SwipeResultAction onSwipeItem(MyViewHolder holder, int position, int result) {
+    public SwipeResultAction onSwipeItem(TransactionItemViewHolder holder, int position, int result) {
         Log.d(TAG, "onSwipeItem(position = " + position + ", result = " + result + ")");
 
         switch (result) {
@@ -253,14 +138,6 @@ public class TransactionListAdapter
         }
     }
 
-    public EventListener getEventListener() {
-        return mEventListener;
-    }
-
-    public void setEventListener(EventListener eventListener) {
-        mEventListener = eventListener;
-    }
-
     private static class SwipeLeftResultAction extends SwipeResultActionMoveToSwipedDirection {
         private TransactionListAdapter mAdapter;
         private final int mPosition;
@@ -275,10 +152,10 @@ public class TransactionListAdapter
         protected void onPerformAction() {
             super.onPerformAction();
 
-            AbstractDataProvider.Data item = mAdapter.mProvider.getItem(mPosition);
+            TransactionItem item = mAdapter.getItem(mPosition);
 
-            if (!item.isPinned()) {
-                item.setPinned(true);
+            if (item != null && !item.isPinned) {
+                item.isPinned = true;
                 mAdapter.notifyItemChanged(mPosition);
                 mSetPinned = true;
             }
@@ -287,10 +164,6 @@ public class TransactionListAdapter
         @Override
         protected void onSlideAnimationEnd() {
             super.onSlideAnimationEnd();
-
-            if (mSetPinned && mAdapter.mEventListener != null) {
-                mAdapter.mEventListener.onItemPinned(mPosition);
-            }
         }
 
         @Override
@@ -314,9 +187,9 @@ public class TransactionListAdapter
         protected void onPerformAction() {
             super.onPerformAction();
 
-            AbstractDataProvider.Data item = mAdapter.mProvider.getItem(mPosition);
-            if (item.isPinned()) {
-                item.setPinned(false);
+            TransactionItem item = mAdapter.getItem(mPosition);
+            if (item.isPinned) {
+                item.isPinned = false;
                 mAdapter.notifyItemChanged(mPosition);
             }
         }

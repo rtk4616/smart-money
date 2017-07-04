@@ -16,8 +16,16 @@
 
 package me.li2.android.fiserv.smartmoney.utils;
 
+import android.content.Context;
+import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import me.li2.android.fiserv.smartmoney.R;
 
 public class ViewUtils {
     public static boolean hitTest(View v, int x, int y) {
@@ -29,5 +37,41 @@ public class ViewUtils {
         final int bottom = v.getBottom() + ty;
 
         return (x >= left) && (x <= right) && (y >= top) && (y <= bottom);
+    }
+
+    public static boolean supportsViewElevation() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
+
+    public static String moneyAmountFormat(Context context, double value) {
+        return String.format(context.getString(R.string.account_balance_format), value);
+    }
+
+
+    private static final String DEFAULT_DATE_FORMATTER = "MM/dd/yyyy";
+    public static final String DATE_FORMAT_hhmma = "hh:mma";
+
+    public static String dateToString(Date date) {
+        return dateToString(date, DEFAULT_DATE_FORMATTER);
+    }
+
+    /**
+     *  Converts date to string values.
+     *
+     * @param date
+     * @param format
+     * @return
+     */
+    public static String dateToString(Date date, String format) {
+        // DONOT use Locale.getDefault(), just display, for example, 02:02a or 02:02p,
+        // instead of multiple language
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+        String result = sdf.format(date);
+        if (format.equals(DATE_FORMAT_hhmma)) {
+            if (result != null && result.length() > 0) {
+                result = result.subSequence(0, result.length()-1).toString();
+            }
+        }
+        return result;
     }
 }

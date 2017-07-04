@@ -22,12 +22,15 @@ public class AccountItem implements Parcelable{
     public long id;
     @SerializedName("balance")
     public double balance;
+    @SerializedName("available_credit")
+    public double availableCredit;
 
-    public AccountItem(String avatarUrl, String name, long id, double balance) {
+    public AccountItem(String avatarUrl, String name, long id, double balance, double availableCredit) {
         this.avatarUrl = avatarUrl;
         this.name = name;
         this.id = id;
         this.balance = balance;
+        this.availableCredit = availableCredit;
     }
 
     @Override
