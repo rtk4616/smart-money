@@ -22,6 +22,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.TransactionConnectActivity" android:theme="@style/Theme.Transparent" />
+
         <service android:name=".service.SmartMoneyService"/>
     </application>
 

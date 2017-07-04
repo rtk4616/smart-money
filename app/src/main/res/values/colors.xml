@@ -8,7 +8,7 @@
     <!-- built-in tool to adjust color and alpha/opacity value, no need to set background alpha -->
     <color name="widget_background">#6cf1fbee</color>
     <color name="transaction_operation_panel_bkg">#FE7122</color>
-    
+    <color name="transaction_connect_bkg">#60000000</color>
     <color name="bg_item_normal_state">@color/widget_background</color>
     <color name="bg_item_swiping_state">@color/widget_background</color>
     <color name="bg_item_swiping_active_state">@color/widget_background</color>

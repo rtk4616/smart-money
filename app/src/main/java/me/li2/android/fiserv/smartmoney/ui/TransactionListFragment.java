@@ -16,6 +16,7 @@
 
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -176,6 +177,7 @@ public class TransactionListFragment extends Fragment {
         int position = mRecyclerView.getChildAdapterPosition(v);
         if (position != RecyclerView.NO_POSITION) {
             Toast.makeText(getContext(), "onItemButtonClick " + position, Toast.LENGTH_SHORT).show();;
+            startActivity(new Intent(getActivity(), TransactionConnectActivity.class));
         }
     }
 

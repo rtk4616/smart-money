@@ -46,6 +46,7 @@ dependencies {
 
     // Loading Progress View
     compile 'com.kaopiz:kprogresshud:1.1.0'
+    compile 'cc.cloudist.acplibrary:library:1.2.1'
 
     // Picasso
     compile 'com.squareup.picasso:picasso:2.5.2'
