@@ -66,11 +66,12 @@ public class BankingOperationFragment extends Fragment {
     @OnClick(R.id.account_transfer_btn)
     public void transferAccount() {
         if (mOnBankingOperationSelectListener != null) {
-            mOnBankingOperationSelectListener.onTransferAccount();
+            mOnBankingOperationSelectListener.onTransferAccount(mAvatorView);
         }
     }
 
     private AccountItemViewHolder mAccountItemViewHolder;
+    private ImageView mAvatorView;
     private AccountItem mAccountItem;
     private int mAccountNumber;
     private BankingOperationAdapter mAdapter;
@@ -92,7 +93,7 @@ public class BankingOperationFragment extends Fragment {
     public interface OnBankingOperationSelectListener {
         void onBankingOperationSelect(@BankingOperation int operation);
         void onRecyclerViewSetup();
-        void onTransferAccount();
+        void onTransferAccount(View sharedElement);
     }
 
     public void setOnBankingOperationSelectListener(OnBankingOperationSelectListener l) {
@@ -117,7 +118,8 @@ public class BankingOperationFragment extends Fragment {
 
         //ViewGroup parent = (ViewGroup) getActivity().getWindow().getDecorView().findViewById(android.R.id.content);
         //View itemView = LayoutInflater.from(getActivity()).inflate(R.layout.widget_account_item_view, parent, false);
-        mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null);
+        mAccountItemViewHolder = new AccountItemViewHolder(mAccountInfoView, null, null);
+        mAvatorView = (ImageView) view.findViewById(R.id.account_avator_view);
 
         final RecyclerView recyclerView = mRecyclerView;
         GridLayoutManager layoutManager = new GridLayoutManager(

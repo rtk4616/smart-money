@@ -95,4 +95,8 @@ public class ViewUtils {
         }
         return null;
     }
+
+    public static String transitionName(Context context, long position) {
+        return context.getString(R.string.transition_name_avator) + position;
+    }
 }

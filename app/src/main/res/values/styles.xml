@@ -33,4 +33,7 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="MaterialAnimations" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    </style>
+
 </resources>

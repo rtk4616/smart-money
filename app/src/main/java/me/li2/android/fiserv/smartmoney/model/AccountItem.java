@@ -14,6 +14,8 @@ import com.google.gson.annotations.SerializedName;
  * https://github.com/li2
  */
 public class AccountItem implements Parcelable{
+    public long position; // NOTE21 for transition with unique id.
+
     @SerializedName("avatar_url")
     public String avatarUrl;
     @SerializedName("name")

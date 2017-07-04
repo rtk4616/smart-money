@@ -26,4 +26,6 @@
     <string name="connect">Connect</string>
     <string name="available_credit">Available Credit</string>
 
+    <!-- Define a common transition name -->
+    <string name="transition_name_avator" translatable="false">avator</string>
 </resources>

@@ -18,20 +18,21 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
@@ -102,6 +103,13 @@ public class TransactionListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // NOTE21-transition: have to tell the Fragment to wait to load until we tell it
+        postponeEnterTransition();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // NOTE21-transition: to tell it what type of Transition we want.
+            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        }
+
         Bundle args = getArguments();
         if (args != null) {
             mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT_ITEM);
@@ -113,6 +121,11 @@ public class TransactionListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_transaction_list, container, false);
         ButterKnife.bind(this, view);
+        if (mAccountItem != null) {
+            // NOTE21-transition: set transitionName on imageView when it's inflated
+            String transitionName = ViewUtils.transitionName(getContext(), mAccountItem.position);
+            ViewCompat.setTransitionName(mAccountAvatorView, transitionName);
+        }
         return view;
     }
 
@@ -196,21 +209,6 @@ public class TransactionListFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void handleOnItemViewClicked(View v) {
-        int position = mRecyclerView.getChildAdapterPosition(v);
-        if (position != RecyclerView.NO_POSITION) {
-            Toast.makeText(getContext(), "onItemClick " + position, Toast.LENGTH_SHORT).show();;
-        }
-    }
-
-    private void handleOnUnderSwipeableViewButtonClicked(View v) {
-        int position = mRecyclerView.getChildAdapterPosition(v);
-        if (position != RecyclerView.NO_POSITION) {
-            Toast.makeText(getContext(), "onItemButtonClick " + position, Toast.LENGTH_SHORT).show();;
-            startActivity(new Intent(getActivity(), TransactionConnectActivity.class));
-        }
-    }
-
     private void updateView() {
         updateAccountItemView(mAccountItem);
         loadTransactions();
@@ -219,7 +217,19 @@ public class TransactionListFragment extends Fragment {
     private void updateAccountItemView(AccountItem accountItem) {
         Picasso.with(getContext())
                 .load(mAccountItem.avatarUrl)
-                .into(mAccountAvatorView);
+                .into(mAccountAvatorView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // NOTE21-transition: make sure we call startPostponedEnterTransition() in the image load callback
+                        // so that the Fragment actually loads.
+                        startPostponedEnterTransition();
+                    }
+
+                    @Override
+                    public void onError() {
+                        startPostponedEnterTransition();
+                    }
+                });
 
         mAccountIdView.setText("" + accountItem.id);
         mAccountBalanceView.setText(ViewUtils.moneyAmountFormat(getContext(), accountItem.balance));

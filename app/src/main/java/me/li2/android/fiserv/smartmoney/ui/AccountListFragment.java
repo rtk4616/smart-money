@@ -1,10 +1,12 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,9 +51,25 @@ public class AccountListFragment extends Fragment {
         mOnAccountSelectListener = l;
     }
 
+    private AccountItemViewHolder.OnSharedElementLoadListener mOnSharedElementLoadListener =
+            new AccountItemViewHolder.OnSharedElementLoadListener() {
+                @Override
+                public void onSharedElementLoad() {
+                    startPostponedEnterTransition();
+                }
+            };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // NOTE21-transition: have to tell the Fragment to wait to load until we tell it
+        postponeEnterTransition();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // NOTE21-transition: to tell it what type of Transition we want.
+            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        }
+
         Bundle args = getArguments();
         if (args != null) {
             mAccounts = args.getParcelableArrayList(ARG_KEY_ACCOUNT_LIST);
@@ -107,7 +125,7 @@ public class AccountListFragment extends Fragment {
         @Override
         public AccountItemViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(mContext).inflate(R.layout.list_account_item, parent, false);
-            return new AccountItemViewHolder(itemView, mOnAccountSelectListener);
+            return new AccountItemViewHolder(itemView, mOnAccountSelectListener, mOnSharedElementLoadListener);
         }
 
         @Override

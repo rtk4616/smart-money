@@ -52,7 +52,7 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     View mOperationPanelView;
 
     @OnClick(R.id.transaction_item_container_view)
-    public void t() {
+    public void onItemClick() {
         Toast.makeText(mContext, "Item " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
     }
 

@@ -20,4 +20,8 @@
         <item name="android:outlineProvider">bounds</item>
     </style>
 
+    <style name="MaterialAnimations" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
 </resources>

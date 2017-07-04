@@ -1,27 +1,35 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.ChangeBounds;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
@@ -144,11 +152,7 @@ public class BankingActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Accounts> call, Response<Accounts> response) {
                 hideLoadingView();
-                mAccountItems = response.body().accounts;
-                BankingOperationFragment fragment = BankingOperationFragment.newInstance(
-                        mAccountItems.get(0), mAccountItems.size());
-                fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
-                addFragmentToStack(fragment);
+                onAccountsGet(response.body().accounts);
             }
 
             @Override
@@ -157,6 +161,21 @@ public class BankingActivity extends AppCompatActivity
                 hideLoadingView();
             }
         });
+    }
+
+    private void onAccountsGet(ArrayList<AccountItem> accounts) {
+        Iterator<AccountItem> iterator = accounts.iterator();
+        long position = 0;
+        while (iterator.hasNext()) {
+            AccountItem item = iterator.next();
+            item.position = position++; // NOTE21 for transition with unique id between list-detail screen.
+        }
+
+        BankingOperationFragment fragment = BankingOperationFragment.newInstance(accounts.get(0), accounts.size());
+        fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
+        addFragmentToStack(null, fragment);
+
+        mAccountItems = accounts;
     }
 
     private Dialog mLoadingDialog;
@@ -199,16 +218,32 @@ public class BankingActivity extends AppCompatActivity
 
 
     //-------- UI Part ------------------------------------------------------------------
-    // use Fragment stack to manage multiple fragments in only one container,
+    // NOTE21: use Fragment stack to manage multiple fragments in only one container,
     // it's much more easier than hide/show with more containers.
+    // Shared elements between fragments refer to https://github.com/lgvalle/Material-Animations#shared-elements-between-fragments
 
-    private void addFragmentToStack(Fragment newFragment) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void addFragmentToStack(View sharedElement, Fragment newFragment) {
         Log.d(TAG, "add fragment to stack: " + newFragment.getClass().getSimpleName());
+
+        Slide slideTransition = new Slide(Gravity.RIGHT);
+        slideTransition.setDuration(getResources().getInteger(R.integer.anim_duration_medium));
+
+        ChangeBounds changeBoundsTransition = new ChangeBounds();
+        changeBoundsTransition.setDuration(getResources().getInteger(R.integer.anim_duration_medium));
+
+        //newFragment.setEnterTransition(slideTransition);
+        newFragment.setAllowEnterTransitionOverlap(false);
+        newFragment.setAllowReturnTransitionOverlap(false);
+        newFragment.setSharedElementEnterTransition(changeBoundsTransition);
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, newFragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
         if (!(newFragment instanceof BankingOperationFragment)) {
             ft.addToBackStack(null);
+        }
+        if (sharedElement != null && ViewCompat.getTransitionName(sharedElement) != null) {
+            ft.addSharedElement(sharedElement, ViewCompat.getTransitionName(sharedElement)); // NOTE21-transition
         }
         ft.commit();
     }
@@ -218,9 +253,10 @@ public class BankingActivity extends AppCompatActivity
     private AccountItemViewHolder.OnAccountSelectListener mOnAccountSelectListener =
             new AccountItemViewHolder.OnAccountSelectListener() {
                 @Override
-                public void onAccountSelect(AccountItem accountItem) {
+                public void onAccountSelect(AccountItem accountItem, View sharedElement) {
+                    // NOTE21-transition: pass sharedElement from fragment to activity by callback
                     Log.d(TAG, "Select account " + accountItem.name);
-                    addFragmentToStack(TransactionListFragment.newInstance(accountItem));
+                    addFragmentToStack(sharedElement, TransactionListFragment.newInstance(accountItem));
                 }
             };
 
@@ -266,10 +302,10 @@ public class BankingActivity extends AppCompatActivity
                 }
 
                 @Override
-                public void onTransferAccount() {
+                public void onTransferAccount(View sharedElement) {
                     AccountListFragment fragment = AccountListFragment.newInstance(mAccountItems);
                     fragment.setOnAccountSelectListener(mOnAccountSelectListener);
-                    addFragmentToStack(fragment);
+                    addFragmentToStack(sharedElement, fragment);
                 }
             };
 }
