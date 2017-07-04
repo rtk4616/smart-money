@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -48,9 +46,6 @@ public class BankingActivity extends AppCompatActivity
     private static final String TAG = "BankingActivity";
     private SmartMoneyService mSmartMoneyService;
     private ArrayList<AccountItem> mAccountItems;
-    private AccountListFragment mAccountListFragment;
-    private BankingOperationFragment mBankingOperationFragment;
-    private TransactionListFragment mTransactionListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,9 +143,12 @@ public class BankingActivity extends AppCompatActivity
         service.getAccounts().enqueue(new Callback<Accounts>() {
             @Override
             public void onResponse(Call<Accounts> call, Response<Accounts> response) {
-                mAccountItems = response.body().accounts;
-                setupBankingOperationFragment(mAccountItems.get(0), mAccountItems.size());
                 hideLoadingView();
+                mAccountItems = response.body().accounts;
+                BankingOperationFragment fragment = BankingOperationFragment.newInstance(
+                        mAccountItems.get(0), mAccountItems.size());
+                fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
+                addFragmentToStack(fragment);
             }
 
             @Override
@@ -201,75 +199,32 @@ public class BankingActivity extends AppCompatActivity
 
 
     //-------- UI Part ------------------------------------------------------------------
+    // use Fragment stack to manage multiple fragments in only one container,
+    // it's much more easier than hide/show with more containers.
 
-    private Fragment findFragment(@IdRes int containerViewId) {
-        return getSupportFragmentManager().findFragmentById(containerViewId);
-    }
-
-    private void addFragment(@IdRes int containerViewId, Fragment fragment) {
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().add(containerViewId, fragment).commit();
-        fm.executePendingTransactions();
-    }
-
-    private void showFragment(Fragment fragment) {
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    //.setCustomAnimations(android.R.anim.slide_in_left, -1)
-                    .show(fragment)
-                    .commit();
+    private void addFragmentToStack(Fragment newFragment) {
+        Log.d(TAG, "add fragment to stack: " + newFragment.getClass().getSimpleName());
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, newFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
+        if (!(newFragment instanceof BankingOperationFragment)) {
+            ft.addToBackStack(null);
         }
-    }
-
-    private void hideFragment(Fragment fragment) {
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    //.setCustomAnimations(-1, android.R.anim.slide_out_right)
-                    .hide(fragment)
-                    .commit();
-        }
+        ft.commit();
     }
 
     //-------- AccountListFragment ------------------------------------------------------
-
-    private void setupAccountListFragment(ArrayList<AccountItem> accounts) {
-        final @IdRes int containerViewId = R.id.fragment_account_list_container;
-        Fragment fragment  = findFragment(containerViewId);
-        if (fragment == null) {
-            fragment = AccountListFragment.newInstance(accounts);
-            addFragment(containerViewId, fragment);
-        }
-        mAccountListFragment = (AccountListFragment) fragment;
-        mAccountListFragment.setOnAccountSelectListener(mOnAccountSelectListener);
-    }
 
     private AccountItemViewHolder.OnAccountSelectListener mOnAccountSelectListener =
             new AccountItemViewHolder.OnAccountSelectListener() {
                 @Override
                 public void onAccountSelect(AccountItem accountItem) {
                     Log.d(TAG, "Select account " + accountItem.name);
-                    hideFragment(mAccountListFragment);
-                    if (mTransactionListFragment != null) {
-                        showFragment(mTransactionListFragment);
-                    } else {
-                        setupTransactionListFragment(accountItem);
-                    }
+                    addFragmentToStack(TransactionListFragment.newInstance(accountItem));
                 }
             };
 
     //-------- BankingOperationFragment -------------------------------------------------
-
-    private void setupBankingOperationFragment(AccountItem accountItem, int accountNumber) {
-        // NOTE21: add fragment programmatically, instead of inflated in the layout.
-        final @IdRes int containerViewId = R.id.fragment_banking_operation_container;
-        Fragment fragment  = findFragment(containerViewId);
-        if (fragment == null) {
-            fragment = BankingOperationFragment.newInstance(accountItem, accountNumber);
-            addFragment(containerViewId, fragment);
-        }
-        mBankingOperationFragment = (BankingOperationFragment) fragment;
-        mBankingOperationFragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
-    }
 
     private BankingOperationFragment.OnBankingOperationSelectListener mOnBankingOperationSelectListener =
             new BankingOperationFragment.OnBankingOperationSelectListener() {
@@ -308,42 +263,13 @@ public class BankingActivity extends AppCompatActivity
 
                 @Override
                 public void onRecyclerViewSetup() {
-                    //updateBankingOperationBkg();
                 }
 
                 @Override
                 public void onTransferAccount() {
-                    hideFragment(mBankingOperationFragment);
-                    if (mAccountListFragment == null) {
-                        setupAccountListFragment(mAccountItems);
-                    } else {
-                        showFragment(mAccountListFragment);
-                    }
+                    AccountListFragment fragment = AccountListFragment.newInstance(mAccountItems);
+                    fragment.setOnAccountSelectListener(mOnAccountSelectListener);
+                    addFragmentToStack(fragment);
                 }
             };
-
-    private void updateBankingOperationBkg() {
-        mBankingOperationFragment.updateOperationItem(
-                BankingOperationFragment.BANKING_OPERATION_INSIGHTS,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_insights));
-        mBankingOperationFragment.updateOperationItem(
-                BankingOperationFragment.BANKING_OPERATION_OFFERS,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_offers));
-        mBankingOperationFragment.updateOperationItem(
-                BankingOperationFragment.BANKING_OPERATION_WALLET,
-                ContextCompat.getDrawable(this, R.drawable.i_banking_wallet));
-    }
-
-
-    //-------- TransactionListFragment -------------------------------------------------
-
-    private void setupTransactionListFragment(AccountItem accountItem) {
-        final @IdRes int containerViewId = R.id.fragment_transaction_list_container;
-        Fragment fragment  = findFragment(containerViewId);
-        if (fragment == null) {
-            fragment = TransactionListFragment.newInstance(accountItem);
-            addFragment(containerViewId, fragment);
-        }
-        mTransactionListFragment = (TransactionListFragment) fragment;
-    }
 }
