@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.annotation.SwipeableItemResults;
@@ -59,12 +58,11 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
 
     @OnClick(R.id.transaction_item_container_view)
     public void onItemClick() {
-        Toast.makeText(mContext, "Item " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
+        // do nothing
     }
 
     @OnClick(R.id.transaction_connect_btn)
     public void onConnectBtnClick() {
-        Toast.makeText(mContext, "Connect " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
         if (mEventListener != null) {
             mEventListener.connect(mTransactionItem);
         }
@@ -72,7 +70,6 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
 
     @OnClick(R.id.transaction_detail_btn)
     public void onDetailsBtnClick() {
-        Toast.makeText(mContext, "Details " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
         if (mEventListener != null) {
             mEventListener.details(mTransactionItem);
         }
