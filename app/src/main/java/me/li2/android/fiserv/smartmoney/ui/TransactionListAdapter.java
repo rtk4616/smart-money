@@ -52,11 +52,13 @@ public class TransactionListAdapter
     }
 
     private ArrayList<TransactionItem> mTransactionItems;
+    private TransactionItemViewHolder.TransactionEventListener mEventListener;
 
-    public TransactionListAdapter() {
+    public TransactionListAdapter(TransactionItemViewHolder.TransactionEventListener l) {
         // SwipeableItemAdapter requires stable ID, and also
         // have to implement the getItemId() method appropriately.
         setHasStableIds(true);
+        mEventListener = l;
     }
 
     public void updateTransactionItems(ArrayList<TransactionItem> items) {
@@ -86,7 +88,7 @@ public class TransactionListAdapter
     public TransactionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final View v = inflater.inflate(R.layout.list_transaction_item, parent, false);
-        return new TransactionItemViewHolder(v);
+        return new TransactionItemViewHolder(v, mEventListener);
     }
 
     @Override

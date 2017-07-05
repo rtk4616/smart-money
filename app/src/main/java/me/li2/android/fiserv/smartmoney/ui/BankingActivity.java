@@ -144,21 +144,19 @@ public class BankingActivity extends AppCompatActivity
     //-------- Loading Accounts ---------------------------------------------------------
 
     private void loadingAccounts() {
-        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(this),
-                getString(R.string.loading_transactions));
-
+        showLoadingDialog();
         FiservService service = ServiceGenerator.createService(FiservService.class);
         service.getAccounts().enqueue(new Callback<Accounts>() {
             @Override
             public void onResponse(Call<Accounts> call, Response<Accounts> response) {
-                hideLoadingView();
+                hideLoadingDialog();
                 onAccountsGet(response.body().accounts);
             }
 
             @Override
             public void onFailure(Call<Accounts> call, Throwable t) {
                 Log.e(TAG, "failed to get accounts");
-                hideLoadingView();
+                hideLoadingDialog();
             }
         });
     }
@@ -180,7 +178,12 @@ public class BankingActivity extends AppCompatActivity
 
     private Dialog mLoadingDialog;
 
-    private void hideLoadingView() {
+    private void showLoadingDialog() {
+        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(this),
+                getString(R.string.logging_in));
+    }
+
+    private void hideLoadingDialog() {
         if (mLoadingDialog != null) {
             mLoadingDialog.dismiss();
             mLoadingDialog = null;

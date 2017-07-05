@@ -25,6 +25,7 @@
     <string name="details">Details</string>
     <string name="connect">Connect</string>
     <string name="available_credit">Available Credit</string>
+    <string name="ready_to_talk">We\'re ready, let\'s talk</string>
 
     <!-- Define a common transition name -->
     <string name="transition_name_avator" translatable="false">avator</string>

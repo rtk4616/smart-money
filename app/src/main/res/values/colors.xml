@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#384243</color>
-    <color name="colorPrimaryDark">#333c3d</color>
+    <color name="colorPrimary">#2B2C30</color>
+    <color name="colorPrimaryDark">#242529</color>
     <color name="colorAccent">#8cf46c</color>
     <color name="line_divider_color">@color/light_grey</color>
     <color name="light_grey">#D3D3D3</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_smoke">#EBEBEB</color>
+    <color name="black">#000000</color>
+    <color name="darkgray">#A9A9A9</color>
+    <color name="lightgray">#D3D3D3</color>
+    <color name="lightslategray">#778899</color>
+    <color name="slategray">#708090</color>
+    <color name="blue">#0000FF</color>
+    <color name="deepskyblue">#47C8EF</color>
+    <color name="mediumslateblue">#7B68EE</color>
+    <color name="salmon">#F37560</color>
+    <color name="medium_purple">#8282D0</color>
+    <color name="bright_cyan">#16D9C0</color>
+    <color name="lawn_green">#1EFF00</color>
+    <color name="red">#FF3B30</color>
+
     <!-- built-in tool to adjust color and alpha/opacity value, no need to set background alpha -->
     <color name="widget_background">#6cf1fbee</color>
+
     <color name="transaction_operation_panel_bkg">#FE7122</color>
-    <color name="transaction_connect_bkg">#60000000</color>
+    <color name="transaction_connect_activity_bkg">#c8000000</color>
+    <color name="transaction_connect_header_bkg">#b48c7a78</color>
+
     <color name="bg_item_normal_state">@color/widget_background</color>
     <color name="bg_item_swiping_state">@color/widget_background</color>
     <color name="bg_item_swiping_active_state">@color/widget_background</color>

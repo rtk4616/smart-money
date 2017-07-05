@@ -18,6 +18,7 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ import me.li2.android.fiserv.smartmoney.model.Transactions;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 import me.li2.android.fiserv.smartmoney.webservice.FiservService;
 import me.li2.android.fiserv.smartmoney.webservice.ServiceGenerator;
+import me.li2.android.fiserv.smartmoney.widget.TransactionItemViewHolder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -145,7 +147,7 @@ public class TransactionListFragment extends Fragment {
         mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
 
         //adapter
-        final TransactionListAdapter myItemAdapter = new TransactionListAdapter();
+        final TransactionListAdapter myItemAdapter = new TransactionListAdapter(mEventListener);
 
         mTransactionListAdapter = myItemAdapter;
         mAdapter = myItemAdapter;
@@ -209,6 +211,18 @@ public class TransactionListFragment extends Fragment {
         super.onDestroyView();
     }
 
+    private TransactionItemViewHolder.TransactionEventListener mEventListener = new TransactionItemViewHolder.TransactionEventListener() {
+        @Override
+        public void connect(TransactionItem item) {
+            startActivity(new Intent(getContext(), TransactionConnectActivity.class));
+        }
+
+        @Override
+        public void details(TransactionItem item) {
+
+        }
+    };
+
     private void updateView() {
         updateAccountItemView(mAccountItem);
         loadTransactions();
@@ -238,7 +252,12 @@ public class TransactionListFragment extends Fragment {
 
     private Dialog mLoadingDialog;
 
-    private void hideLoadingView() {
+    private void showLoadingDialog() {
+        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(getActivity()),
+                getString(R.string.loading_transactions));
+    }
+
+    private void hideLoadingDialog() {
         if (mLoadingDialog != null) {
             mLoadingDialog.dismiss();
             mLoadingDialog = null;
@@ -246,9 +265,7 @@ public class TransactionListFragment extends Fragment {
     }
 
     private void loadTransactions() {
-        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(getActivity()),
-                getString(R.string.loading_transactions));
-
+        showLoadingDialog();
         FiservService service = ServiceGenerator.createService(FiservService.class);
         service.getTransactions().enqueue(new Callback<Transactions>() {
             @Override
@@ -261,12 +278,12 @@ public class TransactionListFragment extends Fragment {
                     item.id = id++; // NOTE21 swipeable feature needs unique id.
                 }
                 mTransactionListAdapter.updateTransactionItems(items);
-                hideLoadingView();
+                hideLoadingDialog();
             }
 
             @Override
             public void onFailure(Call<Transactions> call, Throwable t) {
-                hideLoadingView();
+                hideLoadingDialog();
             }
         });
     }

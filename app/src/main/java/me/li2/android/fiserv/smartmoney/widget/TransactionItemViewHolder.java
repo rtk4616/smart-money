@@ -27,12 +27,18 @@ import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     private static final String TAG = "TransactionItemView";
 
+    public interface TransactionEventListener {
+        void connect(final TransactionItem item);
+        void details(final TransactionItem item);
+    }
+
     // NOTE: Make accessible with short name
     private interface Swipeable extends SwipeableItemConstants {
     }
 
     private Context mContext;
     private TransactionItem mTransactionItem;
+    private TransactionEventListener mEventListener;
 
     @BindView(R.id.transaction_item_container_view)
     ViewGroup mForegroundContainer;
@@ -59,17 +65,24 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     @OnClick(R.id.transaction_connect_btn)
     public void onConnectBtnClick() {
         Toast.makeText(mContext, "Connect " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
+        if (mEventListener != null) {
+            mEventListener.connect(mTransactionItem);
+        }
     }
 
     @OnClick(R.id.transaction_detail_btn)
     public void onDetailsBtnClick() {
         Toast.makeText(mContext, "Details " + mTransactionItem.where, Toast.LENGTH_SHORT).show();
+        if (mEventListener != null) {
+            mEventListener.details(mTransactionItem);
+        }
     }
 
-    public TransactionItemViewHolder(View itemView) {
+    public TransactionItemViewHolder(View itemView, TransactionEventListener l) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         mContext = itemView.getContext();
+        mEventListener = l;
     }
 
     public void bindTransactionItem(TransactionItem item) {

@@ -28,8 +28,9 @@
     </style>
 
     <style name="Theme.Transparent" parent="AppTheme.NoActionBar">
+        <item name="colorPrimaryDark">@android:color/black</item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/transaction_connect_bkg</item>
+        <item name="android:windowBackground">@color/transaction_connect_activity_bkg</item>
         <item name="android:windowNoTitle">true</item>
     </style>
 
