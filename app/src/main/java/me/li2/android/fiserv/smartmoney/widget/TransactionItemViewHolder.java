@@ -132,8 +132,10 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
         // 往右滑动，负数减小，到0
         // 因此可以用它的绝对值当做 alpha
 
-        float alpha = Math.abs(horizontalAmount);
-        mOperationPanelView.setAlpha(alpha);
+        if (horizontalAmount <= 0) {
+            float alpha = Math.abs(horizontalAmount);
+            mOperationPanelView.setAlpha(alpha);
+        }
 
         if (!isSwiping) {
             if (result == Swipeable.RESULT_SWIPED_LEFT) {
