@@ -32,6 +32,8 @@
     <string name="connect_way_chat_detail">Customer service available</string>
     <string name="connect_way_message_title">Secure message</string>
     <string name="connect_way_message_detail">Send a bank mail via secure message</string>
+    <string name="report_fraudulent_transaction">Report Fraudulent Transaction</string>
+    <string name="report_duplicate_transaction">Report Duplicate Transaction</string>
 
     <!-- Define a common transition name -->
     <string name="transition_name_avator" translatable="false">avator</string>
