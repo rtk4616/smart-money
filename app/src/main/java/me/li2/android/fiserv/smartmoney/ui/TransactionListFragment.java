@@ -18,7 +18,6 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -213,8 +212,8 @@ public class TransactionListFragment extends Fragment {
 
     private TransactionItemViewHolder.TransactionEventListener mEventListener = new TransactionItemViewHolder.TransactionEventListener() {
         @Override
-        public void connect(TransactionItem item) {
-            startActivity(new Intent(getContext(), TransactionConnectActivity.class));
+        public void connect(TransactionItem transactionItem) {
+            startActivity(TransactionConnectActivity.newIntent(getContext(), mAccountItem, transactionItem));
         }
 
         @Override

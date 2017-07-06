@@ -28,6 +28,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.model.TransactionItem;
+import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 
 /**
  * Created by weiyi on 04/07/2017.
@@ -35,6 +38,8 @@ import me.li2.android.fiserv.smartmoney.R;
  */
 
 public class TransactionConnectFragment extends Fragment {
+    public static final String ARG_KEY_ACCOUNT = "arg_key_account";
+    public static final String ARG_KEY_TRANSACTION = "arg_key_transaction";
 
     public interface ConnectEventListener {
         void call();
@@ -42,18 +47,50 @@ public class TransactionConnectFragment extends Fragment {
         void message();
     }
 
+    public static TransactionConnectFragment newInstance(Bundle args) {
+        TransactionConnectFragment fragment = new TransactionConnectFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @BindView(R.id.account_name_view)
+    TextView mAccountNameView;
+
+    @BindView(R.id.account_id_view)
+    TextView mAccountIdView;
+
+    @BindView(R.id.transaction_date_view)
+    TextView mTransactionDateView;
+
+    @BindView(R.id.transaction_type_view)
+    TextView mTransactionTypeView;
+
+    @BindView(R.id.transaction_amount_view)
+    TextView mTransactionAmountView;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
 
     @OnClick(R.id.close_btn)
-    public void close() {
+    void close() {
         if (getActivity() != null && !getActivity().isFinishing()) {
             getActivity().finish();
         }
     }
 
     private RecyclerViewExpandableItemManager mExpMgr;
+    private AccountItem mAccountItem;
+    private TransactionItem mTransactionItem;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT);
+            mTransactionItem = args.getParcelable(ARG_KEY_TRANSACTION);
+        }
+    }
 
     @Nullable
     @Override
@@ -76,6 +113,20 @@ public class TransactionConnectFragment extends Fragment {
         mExpMgr = expMgr;
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        updateHeaderView(mAccountItem, mTransactionItem);
+    }
+
+    private void updateHeaderView(final AccountItem accountItem, final TransactionItem transactionItem) {
+        mAccountNameView.setText(accountItem.name);
+        mAccountIdView.setText("" + accountItem.id);
+        mTransactionDateView.setText(ViewUtils.dateToString(transactionItem.date));
+        mTransactionTypeView.setText(transactionItem.type);
+        mTransactionAmountView.setText(ViewUtils.moneyAmountFormat(getContext(), transactionItem.amount));
     }
 
     private ConnectEventListener mEventListener = new ConnectEventListener() {

@@ -42,10 +42,13 @@ public class AccountItem implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(avatarUrl);
-        dest.writeValue(name);
-        dest.writeValue(id);
-        dest.writeValue(balance);
+        dest.writeLong(position);
+        // NOTE21: use writeValue() to write String to parcel will cause problem, that the object cannot retrieve from intent extras!
+        dest.writeString(avatarUrl);
+        dest.writeString(name);
+        dest.writeLong(id);
+        dest.writeDouble(balance);
+        dest.writeDouble(availableCredit);
     }
 
     public static final Parcelable.Creator<AccountItem> CREATOR = new Parcelable.Creator<AccountItem>() {
@@ -61,9 +64,11 @@ public class AccountItem implements Parcelable{
     };
 
     private AccountItem(Parcel source) {
+        position = source.readLong();
         avatarUrl = source.readString();
         name = source.readString();
         id = source.readLong();
         balance = source.readDouble();
+        availableCredit = source.readDouble();
     }
 }
