@@ -127,6 +127,8 @@ public class TransactionConnectFragment extends Fragment {
         mTransactionDateView.setText(ViewUtils.dateToString(transactionItem.date));
         mTransactionTypeView.setText(transactionItem.type);
         mTransactionAmountView.setText(ViewUtils.moneyAmountFormat(getContext(), transactionItem.amount));
+        // NOTE21: TextView text gravity changed when start activity with it as the shared element.
+        // and setTextAlignment not works, however, it works to set the TextView height & width to wrap_content.
     }
 
     private ConnectEventListener mEventListener = new ConnectEventListener() {

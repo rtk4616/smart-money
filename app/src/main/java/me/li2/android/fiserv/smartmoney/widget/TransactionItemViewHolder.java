@@ -27,8 +27,8 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     private static final String TAG = "TransactionItemView";
 
     public interface TransactionEventListener {
-        void connect(final TransactionItem item);
-        void details(final TransactionItem item);
+        void connect(final TransactionItem item, final View sharedElement);
+        void details(final TransactionItem item, final View sharedElement);
     }
 
     // NOTE: Make accessible with short name
@@ -64,14 +64,14 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     @OnClick(R.id.transaction_connect_btn)
     public void onConnectBtnClick() {
         if (mEventListener != null) {
-            mEventListener.connect(mTransactionItem);
+            mEventListener.connect(mTransactionItem, mAmountView);
         }
     }
 
     @OnClick(R.id.transaction_detail_btn)
     public void onDetailsBtnClick() {
         if (mEventListener != null) {
-            mEventListener.details(mTransactionItem);
+            mEventListener.details(mTransactionItem, mAmountView);
         }
     }
 

@@ -17,7 +17,9 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -212,12 +214,21 @@ public class TransactionListFragment extends Fragment {
 
     private TransactionItemViewHolder.TransactionEventListener mEventListener = new TransactionItemViewHolder.TransactionEventListener() {
         @Override
-        public void connect(TransactionItem transactionItem) {
-            startActivity(TransactionConnectActivity.newIntent(getContext(), mAccountItem, transactionItem));
+        public void connect(final TransactionItem transactionItem, final View sharedElement) {
+            Intent intent = TransactionConnectActivity.newIntent(getContext(), mAccountItem, transactionItem);
+
+            // Start an activity with a shared element
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ActivityOptions transitionOptions = ActivityOptions.makeSceneTransitionAnimation(
+                        getActivity(), sharedElement, ViewCompat.getTransitionName(sharedElement));
+                startActivity(intent, transitionOptions.toBundle());
+            } else {
+                startActivity(intent);
+            }
         }
 
         @Override
-        public void details(TransactionItem item) {
+        public void details(final TransactionItem item, final View sharedElement) {
 
         }
     };

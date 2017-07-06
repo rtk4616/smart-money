@@ -37,4 +37,6 @@
 
     <!-- Define a common transition name -->
     <string name="transition_name_avator" translatable="false">avator</string>
+    <string name="transition_name_transaction" translatable="false">transaction</string>
+
 </resources>
