@@ -25,7 +25,21 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:layoutDirection="ltr"
+        android:background="@color/colorPrimary"
+        app:itemTextAppearance="@style/TextAppearance.DrawerMenu.Medium"
+        app:itemIconTint="@android:color/white"
         app:headerLayout="@layout/nav_header_my_banking"
-        app:menu="@menu/activity_my_banking_drawer"/>
+        app:menu="@menu/activity_my_banking_drawer">
+
+        <!-- NOTE21 NavigationView not support footerLayout, but NavigationView works like FrameLayout,
+        so the workaround is to add a layout and set its layout gravity as bottom. -->
+        <include
+            layout="@layout/widget_navigation_footer_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

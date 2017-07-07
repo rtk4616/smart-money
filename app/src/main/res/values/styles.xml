@@ -24,6 +24,10 @@
     <style name="TextAppearance.ListItem.Medium" parent="@android:style/TextAppearance.Holo.Medium"/> <!-- 18sp -->
     <style name="TextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Holo.Small"/> <!-- 14sp -->
 
+    <style name="TextAppearance.DrawerMenu.Large" parent="@android:style/TextAppearance.Holo.Large.Inverse"/>
+    <style name="TextAppearance.DrawerMenu.Medium" parent="@android:style/TextAppearance.Holo.Medium.Inverse"/>
+    <style name="TextAppearance.DrawerMenu.Small" parent="@android:style/TextAppearance.Holo.Small.Inverse"/>
+
     <style name="commonListItemStyle">
     </style>
 

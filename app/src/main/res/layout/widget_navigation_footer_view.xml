@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/app_version_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/app_version"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.DrawerMenu.Small"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/line_divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_version_view"
+        android:id="@+id/view4"/>
+
+    <Button
+        android:id="@+id/log_out_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        android:background="?android:selectableItemBackground"
+        android:clickable="true"
+        android:drawablePadding="16dp"
+        android:drawableRight="@drawable/ic_lock"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="@string/log_out"
+        android:textAppearance="@style/TextAppearance.DrawerMenu.Medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view4"/>
+
+</android.support.constraint.ConstraintLayout>

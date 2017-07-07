@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smart Money</string>
+    <string name="app_name"></string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -37,6 +37,14 @@
     <string name="connect_way_message_detail">Send a bank mail via secure message</string>
     <string name="report_fraudulent_transaction">Report Fraudulent Transaction</string>
     <string name="report_duplicate_transaction">Report Duplicate Transaction</string>
+
+    <string name="drawer_menu_item_banking">My Banking</string>
+    <string name="drawer_menu_item_connect">@string/connect</string>
+    <string name="drawer_menu_item_settings">@string/action_settings</string>
+    <string name="drawer_menu_item_about">About Genius</string>
+    <string name="app_version">Application Version: %s</string>
+    <string name="log_out">Log Out</string>
+    <string name="is_chatting_with_sb">is chatting with %s</string>
 
     <!-- Define a common transition name -->
     <string name="transition_name_avator" translatable="false">avator</string>
