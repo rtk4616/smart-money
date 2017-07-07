@@ -3,7 +3,6 @@ package me.li2.android.fiserv.smartmoney.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +57,5 @@ public class ChatSessionFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mTextView.setText(mChatCause.toString());
-        Log.d(TAG, "" + mChatCause.toString());
     }
 }

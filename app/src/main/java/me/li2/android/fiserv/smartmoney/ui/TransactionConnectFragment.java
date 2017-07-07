@@ -142,7 +142,6 @@ public class TransactionConnectFragment extends Fragment {
 
         @Override
         public void chat(@ChatCause.ReportType int reportType) {
-            Toast.makeText(getContext(), "on Chat click", Toast.LENGTH_SHORT).show();
             ChatCause chatCause = new ChatCause(
                     reportType,
                     "Ice Bear",
@@ -246,8 +245,8 @@ public class TransactionConnectFragment extends Fragment {
 
         @OnClick(R.id.report_item_view)
         public void onReportClick() {
-            Toast.makeText(getContext(), "On " + mTextView.getText() + " click", Toast.LENGTH_SHORT).show();
-            @ChatCause.ReportType int reportType = (getAdapterPosition() == 0) ?
+            @ChatCause.ReportType int reportType =
+                    (mTextView.getText().equals(getString(R.string.report_fraudulent_transaction))) ?
                     ChatCause.REPORT_TYPE_FRAUDULENT_TRANSACTION :
                     ChatCause.REPORT_TYPE_DUPLICATED_TRANSACTION;
             mEventListener.chat(reportType);
@@ -292,7 +291,7 @@ public class TransactionConnectFragment extends Fragment {
                     getString(R.string.connect_way_message_detail),
                     R.drawable.i_pencil,
                     R.drawable.i_connect_message,
-                    children);
+                    null);
 
             mItems.add(group1);
             mItems.add(group2);

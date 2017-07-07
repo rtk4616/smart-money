@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -60,8 +61,10 @@ public class BankingActivity extends AppCompatActivity
     private static final String TAG = "BankingActivity";
     private static final String ACTION_START_CHAT = "action_start_chat";
 
-    private SmartMoneyService mSmartMoneyService;
+    private SmartMoneyService mService;
     private ArrayList<AccountItem> mAccountItems;
+    private AccountItem mSelAccount;
+    private NavigationViewManager mNavigationViewMgr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,7 @@ public class BankingActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        mNavigationViewMgr = new NavigationViewManager(navigationView);
 
         attachService();
         loadingAccounts();
@@ -100,7 +104,9 @@ public class BankingActivity extends AppCompatActivity
         String action = getIntent().getAction();
         if (action == ACTION_START_CHAT) {
             ChatCause chatCause = getIntent().getParcelableExtra(ARG_KEY_CHAT_CAUSE);
-            startChat(chatCause);
+            if (chatCause != null) {
+                startChat(chatCause);
+            }
         }
     }
 
@@ -186,18 +192,25 @@ public class BankingActivity extends AppCompatActivity
     }
 
     private void onAccountsGet(ArrayList<AccountItem> accounts) {
+        if (accounts == null || accounts.size() <= 0) {
+            showLoadingFailedDialog();
+            return;
+        }
+
         Iterator<AccountItem> iterator = accounts.iterator();
         long position = 0;
         while (iterator.hasNext()) {
             AccountItem item = iterator.next();
             item.position = position++; // NOTE21 for transition with unique id between list-detail screen.
         }
+        mAccountItems = accounts;
+        mSelAccount = accounts.get(0);
 
-        BankingOperationFragment fragment = BankingOperationFragment.newInstance(accounts.get(0), accounts.size());
+        BankingOperationFragment fragment = BankingOperationFragment.newInstance(mSelAccount, accounts.size());
         fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
         addFragmentToStack(null, fragment);
 
-        mAccountItems = accounts;
+        mNavigationViewMgr.updateAccountView(mSelAccount.name, mSelAccount.avatarUrl);
     }
 
     private Dialog mLoadingDialog;
@@ -235,13 +248,15 @@ public class BankingActivity extends AppCompatActivity
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             SmartMoneyService.SmartMoneyServiceBinder binder = (SmartMoneyService.SmartMoneyServiceBinder) service;
-            mSmartMoneyService = binder.getService();
-            onServiceAttached(mSmartMoneyService);
+            mService = binder.getService();
+            onServiceAttached(mService);
+            mNavigationViewMgr.updateChatStatus(mService.isChatting);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mSmartMoneyService = null;
+            mService.isChatting = false;
+            mService = null;
         }
     };
 
@@ -361,5 +376,13 @@ public class BankingActivity extends AppCompatActivity
     private void startChat(ChatCause chatCause) {
         ChatSessionFragment fragment = ChatSessionFragment.newInstance(chatCause);
         addFragmentToStack(null, fragment);
+
+        if (mService != null) {
+            mService.chatToName = chatCause.chatToName;
+            mService.chatToAvatorUrl = chatCause.chatToAvatorUrl;
+            mService.isChatting = true;
+        }
+
+        mNavigationViewMgr.updateChatView(chatCause.chatToName, chatCause.chatToAvatorUrl);
     }
 }

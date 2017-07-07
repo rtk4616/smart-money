@@ -46,32 +46,33 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nav_user_avator"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="86dp"
+        android:layout_height="86dp"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="24dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/textView4"
+        app:layout_constraintRight_toLeftOf="@+id/nav_chatting_dot_view"
         app:layout_constraintTop_toBottomOf="@+id/nav_chatting_with_view"
         app:layout_constraintVertical_bias="0.0"/>
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/nav_chatting_dot_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:text="..."
         android:textAlignment="center"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="@+id/nav_user_avator"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/nav_user_avator"/>
+        app:layout_constraintTop_toTopOf="@+id/nav_user_avator"
+        app:layout_constraintHorizontal_bias="0.502"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nav_chatting_with_avator"
@@ -82,7 +83,7 @@
         android:layout_marginTop="8dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toBottomOf="@+id/nav_user_avator"
-        app:layout_constraintLeft_toRightOf="@+id/textView4"
+        app:layout_constraintLeft_toRightOf="@+id/nav_chatting_dot_view"
         app:layout_constraintTop_toTopOf="@+id/nav_user_avator"/>
 
     <android.support.constraint.Guideline

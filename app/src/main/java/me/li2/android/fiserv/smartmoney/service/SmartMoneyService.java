@@ -13,7 +13,7 @@ import android.support.annotation.Nullable;
 
 public class SmartMoneyService extends Service {
     private static final String TAG = "SmartMoneyService";
-    
+
     public class SmartMoneyServiceBinder extends Binder {
         public SmartMoneyService getService() {
             return SmartMoneyService.this;
@@ -40,4 +40,11 @@ public class SmartMoneyService extends Service {
     public void onDestroy() {
         super.onDestroy();
     }
+
+
+    //-------- Chatting Info ------------------------------------------------------------
+
+    public boolean isChatting;
+    public String chatToName;
+    public String chatToAvatorUrl;
 }
