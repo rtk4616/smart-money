@@ -36,14 +36,18 @@ import java.util.Iterator;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
 import me.li2.android.fiserv.smartmoney.model.Accounts;
+import me.li2.android.fiserv.smartmoney.model.ChatCause;
 import me.li2.android.fiserv.smartmoney.service.SmartMoneyService;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 import me.li2.android.fiserv.smartmoney.webservice.FiservService;
 import me.li2.android.fiserv.smartmoney.webservice.ServiceGenerator;
 import me.li2.android.fiserv.smartmoney.widget.AccountItemViewHolder;
+import me.li2.android.fiserv.smartmoney.widget.NavigationViewManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static me.li2.android.fiserv.smartmoney.ui.ChatSessionFragment.ARG_KEY_CHAT_CAUSE;
 
 /**
  * Created by weiyi on 01/07/2017.
@@ -54,6 +58,8 @@ public class BankingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "BankingActivity";
+    private static final String ACTION_START_CHAT = "action_start_chat";
+
     private SmartMoneyService mSmartMoneyService;
     private ArrayList<AccountItem> mAccountItems;
 
@@ -77,6 +83,25 @@ public class BankingActivity extends AppCompatActivity
 
         attachService();
         loadingAccounts();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // NOTE21: this method will refresh intent, otherwise getIntent will always return the very First.
+        // and that's why intent extra is null.
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String action = getIntent().getAction();
+        if (action == ACTION_START_CHAT) {
+            ChatCause chatCause = getIntent().getParcelableExtra(ARG_KEY_CHAT_CAUSE);
+            startChat(chatCause);
+        }
     }
 
     @Override
@@ -124,7 +149,7 @@ public class BankingActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_banking) {
-            // Handle the camera action
+
         } else if (id == R.id.nav_connect) {
 
         } else if (id == R.id.nav_settings) {
@@ -324,4 +349,17 @@ public class BankingActivity extends AppCompatActivity
                     addFragmentToStack(sharedElement, fragment);
                 }
             };
+
+    //-------- Chat Session Fragment ----------------------------------------------------
+    public static Intent newIntentToChat(Context packageContext, ChatCause chatCause) {
+        Intent intent = new Intent(packageContext, BankingActivity.class);
+        intent.setAction(ACTION_START_CHAT);
+        intent.putExtra(ARG_KEY_CHAT_CAUSE, chatCause);
+        return intent;
+    }
+
+    private void startChat(ChatCause chatCause) {
+        ChatSessionFragment fragment = ChatSessionFragment.newInstance(chatCause);
+        addFragmentToStack(null, fragment);
+    }
 }

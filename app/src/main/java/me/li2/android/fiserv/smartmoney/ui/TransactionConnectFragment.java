@@ -30,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
+import me.li2.android.fiserv.smartmoney.model.ChatCause;
 import me.li2.android.fiserv.smartmoney.model.TransactionItem;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 
@@ -44,7 +45,7 @@ public class TransactionConnectFragment extends Fragment {
 
     public interface ConnectEventListener {
         void call();
-        void chat();
+        void chat(@ChatCause.ReportType int reportType);
         void message();
     }
 
@@ -140,8 +141,17 @@ public class TransactionConnectFragment extends Fragment {
         }
 
         @Override
-        public void chat() {
+        public void chat(@ChatCause.ReportType int reportType) {
             Toast.makeText(getContext(), "on Chat click", Toast.LENGTH_SHORT).show();
+            ChatCause chatCause = new ChatCause(
+                    reportType,
+                    "Ice Bear",
+                    null,
+                    mTransactionItem.type,
+                    mTransactionItem.id,
+                    mAccountItem.name,
+                    mAccountItem.id);
+            startActivity(BankingActivity.newIntentToChat(getActivity(), chatCause));
         }
 
         @Override
@@ -204,7 +214,7 @@ public class TransactionConnectFragment extends Fragment {
                 if (position == 0) {
                     mEventListener.call();
                 } else if (position == 1) {
-                    mEventListener.chat();
+                    //
                 } else if (position == 2) {
                     mEventListener.message();
                 }
@@ -237,6 +247,10 @@ public class TransactionConnectFragment extends Fragment {
         @OnClick(R.id.report_item_view)
         public void onReportClick() {
             Toast.makeText(getContext(), "On " + mTextView.getText() + " click", Toast.LENGTH_SHORT).show();
+            @ChatCause.ReportType int reportType = (getAdapterPosition() == 0) ?
+                    ChatCause.REPORT_TYPE_FRAUDULENT_TRANSACTION :
+                    ChatCause.REPORT_TYPE_DUPLICATED_TRANSACTION;
+            mEventListener.chat(reportType);
         }
 
         public ReportWayViewHolder(View itemView) {
