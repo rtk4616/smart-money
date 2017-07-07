@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -122,12 +124,19 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
     public void onSlideAmountUpdated(float horizontalAmount, float verticalAmount, boolean isSwiping) {
         super.onSlideAmountUpdated(horizontalAmount, verticalAmount, isSwiping);
         @SwipeableItemResults int result = getSwipeResult();
-
         Log.d(TAG, "H amount " + horizontalAmount + ", " + isSwiping + ", result " + result);
 
-        // 往左滑动，负数增大 -0.004 到 -0.99， 到 0。透明度增大
-        // 往右滑动，负数减小，到0
-        // 因此可以用它的绝对值当做 alpha
+        // NOTE21: To animate the background panel view position, just set X to follow the right of container view.
+        // no need to set animation: .animate().translationX. Because this callback is an updated listener!
+
+        float x1 = mForegroundContainer.getX();
+        float w1 = mForegroundContainer.getWidth();
+        mOperationPanelView.setX(x1+w1);
+
+        // NOTE21: To animate the background panel view alpha, just use the para horizontalAmount !
+        // it changes from  0 to -1 when scroll from right to left, <<--
+        // it changes from -1 to  0 when scroll from left to right, -->>
+        // so wen can use its abs value as alpha
 
         if (horizontalAmount <= 0) {
             float alpha = Math.abs(horizontalAmount);
@@ -138,7 +147,12 @@ public class TransactionItemViewHolder extends AbstractSwipeableItemViewHolder {
             if (result == Swipeable.RESULT_SWIPED_LEFT) {
                 mOperationPanelView.setAlpha(1);
             } else if (result == Swipeable.RESULT_SWIPED_RIGHT || result == Swipeable.RESULT_CANCELED) {
-                mOperationPanelView.setAlpha(0);
+                // NOTE21: Property Animation will change the real value! so it affects other view items in recyclerview.
+                // so we should use View Animation here.
+                //mOperationPanelView.animate().alpha(0);
+                Animation animation = new AlphaAnimation(mOperationPanelView.getAlpha(), 0);
+                animation.setDuration(250);
+                animation.start();
             }
         }
     }
