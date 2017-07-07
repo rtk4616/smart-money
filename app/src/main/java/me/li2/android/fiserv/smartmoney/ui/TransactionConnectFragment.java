@@ -3,6 +3,7 @@ package me.li2.android.fiserv.smartmoney.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -74,7 +75,8 @@ public class TransactionConnectFragment extends Fragment {
     @OnClick(R.id.close_btn)
     void close() {
         if (getActivity() != null && !getActivity().isFinishing()) {
-            getActivity().finish();
+            // NOTE21: Keep shared element transitions with calling activity finish().
+            ActivityCompat.finishAfterTransition(getActivity());
         }
     }
 
