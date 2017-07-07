@@ -18,7 +18,9 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
@@ -294,7 +296,22 @@ public class TransactionListFragment extends Fragment {
             @Override
             public void onFailure(Call<Transactions> call, Throwable t) {
                 hideLoadingDialog();
+                showLoadingFailedDialog();
             }
         });
+    }
+
+    private void showLoadingFailedDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage(R.string.loading_transactions_failed)
+                .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadTransactions();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setCancelable(false)
+                .show();
     }
 }

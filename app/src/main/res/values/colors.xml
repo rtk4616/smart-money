@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#2B2C30</color>
     <color name="colorPrimaryDark">#242529</color>
-    <color name="colorAccent">#8cf46c</color>
+    <color name="colorAccent">@color/transaction_operation_panel_bkg</color>
     <color name="line_divider_color">@color/light_grey</color>
     <color name="light_grey">#D3D3D3</color>
     <color name="white">#FFFFFF</color>

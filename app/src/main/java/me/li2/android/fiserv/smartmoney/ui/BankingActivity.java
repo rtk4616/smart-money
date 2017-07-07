@@ -2,8 +2,10 @@ package me.li2.android.fiserv.smartmoney.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
@@ -157,6 +159,7 @@ public class BankingActivity extends AppCompatActivity
             public void onFailure(Call<Accounts> call, Throwable t) {
                 Log.e(TAG, "failed to get accounts");
                 hideLoadingDialog();
+                showLoadingFailedDialog();
             }
         });
     }
@@ -188,6 +191,20 @@ public class BankingActivity extends AppCompatActivity
             mLoadingDialog.dismiss();
             mLoadingDialog = null;
         }
+    }
+
+    private void showLoadingFailedDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.logging_in_failed)
+                .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadingAccounts();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setCancelable(false)
+                .show();
     }
 
 
