@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
@@ -38,6 +39,7 @@ import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.AccountItem;
 import me.li2.android.fiserv.smartmoney.model.Accounts;
 import me.li2.android.fiserv.smartmoney.model.ChatCause;
+import me.li2.android.fiserv.smartmoney.model.FragmentTag;
 import me.li2.android.fiserv.smartmoney.service.SmartMoneyService;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 import me.li2.android.fiserv.smartmoney.webservice.FiservService;
@@ -224,7 +226,7 @@ public class BankingActivity extends AppCompatActivity
 
         BankingOperationFragment fragment = BankingOperationFragment.newInstance(mSelAccount, accounts.size());
         fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
-        addFragmentToStack(fragment);
+        addFragmentToStack(fragment, FragmentTag.MY_BANKING);
 
         mNavigationViewMgr.updateAccountView(mSelAccount.name, mSelAccount.avatarUrl);
     }
@@ -295,7 +297,14 @@ public class BankingActivity extends AppCompatActivity
     // Shared elements between fragments refer to https://github.com/lgvalle/Material-Animations#shared-elements-between-fragments
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void addFragmentToStack(View sharedElement, Fragment newFragment) {
+    private void addFragmentToStack(View sharedElement, Fragment newFragment, String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentByTag(tag);
+        if (fragment != null) {
+            Log.d(TAG, "" + fragment.getClass().getSimpleName() + " already in fm");
+            return;
+        }
+
         Log.d(TAG, "add fragment to stack: " + newFragment.getClass().getSimpleName());
 
         Slide slideTransition = new Slide(Gravity.RIGHT);
@@ -309,8 +318,8 @@ public class BankingActivity extends AppCompatActivity
         newFragment.setAllowReturnTransitionOverlap(false);
         newFragment.setSharedElementEnterTransition(changeBoundsTransition);
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, newFragment);
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_container, newFragment, tag);
         if (!(newFragment instanceof BankingOperationFragment)) {
             ft.addToBackStack(null);
         }
@@ -320,8 +329,8 @@ public class BankingActivity extends AppCompatActivity
         ft.commit();
     }
 
-    private void addFragmentToStack(Fragment fragment) {
-        addFragmentToStack(null, fragment);
+    private void addFragmentToStack(Fragment fragment, String tag) {
+        addFragmentToStack(null, fragment, tag);
     }
 
     //-------- AccountListFragment ------------------------------------------------------
@@ -332,7 +341,7 @@ public class BankingActivity extends AppCompatActivity
                 public void onAccountSelect(AccountItem accountItem, View sharedElement) {
                     // NOTE21-transition: pass sharedElement from fragment to activity by callback
                     Log.d(TAG, "Select account " + accountItem.name);
-                    addFragmentToStack(sharedElement, TransactionListFragment.newInstance(accountItem));
+                    addFragmentToStack(sharedElement, TransactionListFragment.newInstance(accountItem), FragmentTag.TRANSACTION_LIST);
                 }
             };
 
@@ -345,7 +354,7 @@ public class BankingActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(), "banking operation " + operation, Toast.LENGTH_SHORT).show();
                     switch (operation) {
                         case BankingOperationFragment.BANKING_OPERATION_OFFERS:
-                            addFragmentToStack(new OfferSearchFragment());
+                            addFragmentToStack(new OfferSearchFragment(), FragmentTag.OFFER_SEARCH);
                             break;
                     }
                 }
@@ -358,7 +367,7 @@ public class BankingActivity extends AppCompatActivity
                 public void onTransferAccount(View sharedElement) {
                     AccountListFragment fragment = AccountListFragment.newInstance(mAccountItems);
                     fragment.setOnAccountSelectListener(mOnAccountSelectListener);
-                    addFragmentToStack(sharedElement, fragment);
+                    addFragmentToStack(sharedElement, fragment, FragmentTag.ACCOUNT_LIST);
                 }
             };
 
@@ -372,8 +381,7 @@ public class BankingActivity extends AppCompatActivity
     }
 
     private void startChat(ChatCause chatCause) {
-        ChatSessionFragment fragment = ChatSessionFragment.newInstance(chatCause);
-        addFragmentToStack(fragment);
+        addFragmentToStack(ChatSessionFragment.newInstance(chatCause), null);
 
         if (mService != null) {
             mService.chatToName = chatCause.chatToName;
@@ -385,5 +393,4 @@ public class BankingActivity extends AppCompatActivity
     }
 
     //-------- Google Maps Fragment ----------------------------------------------------
-
 }
