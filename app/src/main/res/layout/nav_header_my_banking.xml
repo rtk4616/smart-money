@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/side_nav_bar"
@@ -44,47 +45,49 @@
         app:layout_constraintTop_toTopOf="@+id/nav_chatting_with_view"
         app:layout_constraintVertical_bias="0.5"/>
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/nav_user_avator"
-        android:layout_width="86dp"
-        android:layout_height="86dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="24dp"
-        android:src="@mipmap/ic_launcher"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/nav_chatting_dot_view"
-        app:layout_constraintTop_toBottomOf="@+id/nav_chatting_with_view"
-        app:layout_constraintVertical_bias="0.0"/>
-
     <TextView
         android:id="@+id/nav_chatting_dot_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp"
         android:text="..."
-        android:textAlignment="center"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="@+id/nav_user_avator"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:textAppearance="@style/TextAppearance.ListItem.SuperLarge"
+        android:textColor="@color/white"
+        android:textSize="46sp"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline12"
+        app:layout_constraintRight_toLeftOf="@+id/guideline12"
+        android:layout_marginRight="0dp"
         app:layout_constraintTop_toTopOf="@+id/nav_user_avator"
-        app:layout_constraintHorizontal_bias="0.502"/>
+        android:layout_marginTop="0dp"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nav_chatting_with_avator"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
         android:layout_marginTop="8dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toBottomOf="@+id/nav_user_avator"
-        app:layout_constraintLeft_toRightOf="@+id/nav_chatting_dot_view"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline12"
+        app:layout_constraintRight_toLeftOf="@+id/guideline12"
         app:layout_constraintTop_toTopOf="@+id/nav_user_avator"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/nav_user_avator"
+        android:layout_width="86dp"
+        android:layout_height="86dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="24dp"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nav_chatting_with_view"
+        app:layout_constraintVertical_bias="0.0"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline12"
+        app:layout_constraintRight_toLeftOf="@+id/guideline12"
+        android:layout_marginRight="0dp"/>
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"

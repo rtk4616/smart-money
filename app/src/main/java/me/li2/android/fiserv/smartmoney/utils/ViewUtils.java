@@ -99,4 +99,16 @@ public class ViewUtils {
     public static String transitionName(Context context, long position) {
         return context.getString(R.string.transition_name_avator) + position;
     }
+
+    /**
+     * Convert the dps to pixels, based on density scale
+     * @param dp value expressed in dps
+     * @return value expressed in pixels
+     */
+    public static int dpToPixel(Context context, int dp) {
+        // Get the screen's density scaling factor
+        float scale = context.getResources().getDisplayMetrics().density;
+        // Add 0.5f to round the figure up to the nearest whole number
+        return (int) (dp * scale + 0.5f);
+    }
 }

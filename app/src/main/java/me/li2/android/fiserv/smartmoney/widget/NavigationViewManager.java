@@ -3,6 +3,8 @@ package me.li2.android.fiserv.smartmoney.widget;
 import android.content.Context;
 import android.support.design.widget.NavigationView;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.BuildConfig;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
 
 /**
  * Created by weiyi on 07/07/2017.
@@ -76,6 +79,25 @@ public class NavigationViewManager {
                 .placeholder(R.drawable.i_connect_avator3)
                 .error(R.drawable.i_connect_avator3)
                 .into(mChatAvatorView);
+    }
+
+    private float mLastX1;
+    private float mLastX2;
+
+    public void animateChatView(boolean opened) {
+        int tx1 = ViewUtils.dpToPixel(mContext, 72);
+        int tx2 = ViewUtils.dpToPixel(mContext, 60);
+        Interpolator interpolator = new AccelerateDecelerateInterpolator();
+        if (opened) {
+            mLastX1 = mUserAvatorView.getX();
+            mLastX2 = mChatAvatorView.getX();
+            mUserAvatorView.animate().translationX(-1 * tx1).setInterpolator(interpolator);
+            mChatAvatorView.animate().translationX(tx2).setInterpolator(interpolator);
+        } else {
+            // revert
+            mUserAvatorView.setX(mLastX1);
+            mChatAvatorView.setX(mLastX2);
+        }
     }
 
     private void setAppVersion() {
