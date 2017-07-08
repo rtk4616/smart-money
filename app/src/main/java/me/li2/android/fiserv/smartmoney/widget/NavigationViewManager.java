@@ -85,6 +85,7 @@ public class NavigationViewManager {
     private float mLastX2;
 
     public void animateChatView(boolean opened) {
+        // 72 = Radius of AvatorView + half width of DotView + padding
         int tx1 = ViewUtils.dpToPixel(mContext, 72);
         int tx2 = ViewUtils.dpToPixel(mContext, 60);
         Interpolator interpolator = new AccelerateDecelerateInterpolator();

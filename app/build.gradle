@@ -62,4 +62,7 @@ dependencies {
 
     // Retrofit GSON converter
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+
+    // Google Maps
+    compile 'com.google.android.gms:play-services-maps:11.0.2'
 }

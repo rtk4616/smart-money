@@ -224,7 +224,7 @@ public class BankingActivity extends AppCompatActivity
 
         BankingOperationFragment fragment = BankingOperationFragment.newInstance(mSelAccount, accounts.size());
         fragment.setOnBankingOperationSelectListener(mOnBankingOperationSelectListener);
-        addFragmentToStack(null, fragment);
+        addFragmentToStack(fragment);
 
         mNavigationViewMgr.updateAccountView(mSelAccount.name, mSelAccount.avatarUrl);
     }
@@ -320,6 +320,10 @@ public class BankingActivity extends AppCompatActivity
         ft.commit();
     }
 
+    private void addFragmentToStack(Fragment fragment) {
+        addFragmentToStack(null, fragment);
+    }
+
     //-------- AccountListFragment ------------------------------------------------------
 
     private AccountItemViewHolder.OnAccountSelectListener mOnAccountSelectListener =
@@ -340,31 +344,8 @@ public class BankingActivity extends AppCompatActivity
                 public void onBankingOperationSelect(@BankingOperationFragment.BankingOperation int operation) {
                     Toast.makeText(getApplicationContext(), "banking operation " + operation, Toast.LENGTH_SHORT).show();
                     switch (operation) {
-                        case BankingOperationFragment.BANKING_OPERATION_PAY_MERCHANT:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_PAY_BILL:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_PAY_COMPANY:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_PAY_PERSON:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_REQUEST_MONEY:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_DEPOSIT_CHECK:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_INSIGHTS:
-                            break;
-
                         case BankingOperationFragment.BANKING_OPERATION_OFFERS:
-                            break;
-
-                        case BankingOperationFragment.BANKING_OPERATION_WALLET:
+                            addFragmentToStack(new OfferSearchFragment());
                             break;
                     }
                 }
@@ -382,6 +363,7 @@ public class BankingActivity extends AppCompatActivity
             };
 
     //-------- Chat Session Fragment ----------------------------------------------------
+
     public static Intent newIntentToChat(Context packageContext, ChatCause chatCause) {
         Intent intent = new Intent(packageContext, BankingActivity.class);
         intent.setAction(ACTION_START_CHAT);
@@ -391,7 +373,7 @@ public class BankingActivity extends AppCompatActivity
 
     private void startChat(ChatCause chatCause) {
         ChatSessionFragment fragment = ChatSessionFragment.newInstance(chatCause);
-        addFragmentToStack(null, fragment);
+        addFragmentToStack(fragment);
 
         if (mService != null) {
             mService.chatToName = chatCause.chatToName;
@@ -401,4 +383,7 @@ public class BankingActivity extends AppCompatActivity
 
         mNavigationViewMgr.updateChatView(chatCause.chatToName, chatCause.chatToAvatorUrl);
     }
+
+    //-------- Google Maps Fragment ----------------------------------------------------
+
 }
