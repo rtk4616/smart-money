@@ -3,6 +3,7 @@ package me.li2.android.fiserv.smartmoney.ui;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,6 +40,7 @@ public class BankingOperationFragment extends Fragment {
     private static final String TAG = "BankingOperation";
     private static final String ARG_KEY_ACCOUNT_ITEM = "ArgKeyAccountItem";
     private static final String ARG_KEY_ACCOUNT_NUMBER = "ArgKeyAccountNumber";
+    private static final String ARG_KEY_RECYCLER_VIEW_HEIGHT = "arg_key_recycler_view_height";
     private static final int LAYOUT_COLUMNS_NUMBER = 3;
     private static final int LAYOUT_ROWS_NUMBER = 3;
 
@@ -76,6 +78,7 @@ public class BankingOperationFragment extends Fragment {
     private int mAccountNumber;
     private BankingOperationAdapter mAdapter;
     private OnBankingOperationSelectListener mOnBankingOperationSelectListener;
+    private int mRecyclerViewHeight;
 
     public BankingOperationFragment() {
     }
@@ -103,12 +106,26 @@ public class BankingOperationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
         Bundle args = getArguments();
         if (args != null) {
             mAccountItem = args.getParcelable(ARG_KEY_ACCOUNT_ITEM);
             mAccountNumber = args.getInt(ARG_KEY_ACCOUNT_NUMBER, 0);
         }
-        setRetainInstance(true);
+
+        if (savedInstanceState != null) {
+            mRecyclerViewHeight = savedInstanceState.getInt(ARG_KEY_RECYCLER_VIEW_HEIGHT);
+        } else {
+            mRecyclerViewHeight = PreferenceManager.getDefaultSharedPreferences(getContext())
+                    .getInt(ARG_KEY_RECYCLER_VIEW_HEIGHT, 0);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ARG_KEY_RECYCLER_VIEW_HEIGHT, mRecyclerViewHeight);
     }
 
     @Override
@@ -128,19 +145,21 @@ public class BankingOperationFragment extends Fragment {
         recyclerView.setScrollContainer(false);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
-        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Log.d(TAG, "RecyclerView height is ready " + recyclerView.getMeasuredHeight());
-                recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                mAdapter = new BankingOperationAdapter(getActivity(), createOperationItems(), recyclerView.getMeasuredHeight());
-                recyclerView.setAdapter(mAdapter);
-                if (mOnBankingOperationSelectListener != null) {
-                    mOnBankingOperationSelectListener.onRecyclerViewSetup();
+        // NOTE21: optimize recyclerview setup
+        if (mRecyclerViewHeight > 0) {
+            setupAdapter(recyclerView, mRecyclerViewHeight);
+        } else {
+            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mRecyclerViewHeight = recyclerView.getMeasuredHeight();
+                    Log.d(TAG, "RecyclerView height is ready " + mRecyclerViewHeight);
+                    setupAdapter(recyclerView, mRecyclerViewHeight);
                 }
-            }
-        });
-
+            });
+        }
+        
         return view;
     }
 
@@ -148,6 +167,15 @@ public class BankingOperationFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateAccountView(mAccountNumber, mAccountItem);
+    }
+
+    @Override
+    public void onDestroy() {
+        PreferenceManager.getDefaultSharedPreferences(getContext())
+                .edit()
+                .putInt(ARG_KEY_RECYCLER_VIEW_HEIGHT, mRecyclerViewHeight)
+                .apply();
+        super.onDestroy();
     }
 
     public void updateAccountView(int accountNumber, AccountItem accountItem) {
@@ -193,6 +221,14 @@ public class BankingOperationFragment extends Fragment {
     }
 
     //-------- BankingOperationAdapter --------------------------------------------------
+
+    private void setupAdapter(RecyclerView recyclerView, int height) {
+        mAdapter = new BankingOperationAdapter(getActivity(), createOperationItems(), height);
+        recyclerView.setAdapter(mAdapter);
+        if (mOnBankingOperationSelectListener != null) {
+            mOnBankingOperationSelectListener.onRecyclerViewSetup();
+        }
+    }
 
     private class BankingOperationAdapter extends RecyclerView.Adapter<BankingOperationViewHolder> {
         private Context mContext;
