@@ -56,6 +56,10 @@
         Can you please assist me?
     </string>
     <string name="directions">Directions</string>
+    <string name="activated">Activated</string>
+    <string name="offer_distance_pattern">%1$.1f Km Away</string>
+    <string name="offer_money_saved_month_pattern">You saved $%1$.2f this month</string>
+    <string name="offer_money_saved_next_purchase_pattern">Save %1$.0f%% on your next purchase at %2$s</string>
 
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>

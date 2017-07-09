@@ -68,4 +68,7 @@ dependencies {
 
     // Search View
     compile 'com.github.arimorty:floatingsearchview:2.1.1'
+
+    // Sliding up panel
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
 }
