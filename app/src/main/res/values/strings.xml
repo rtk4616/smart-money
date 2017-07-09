@@ -55,6 +55,7 @@
         Account Number: %5$d \n
         Can you please assist me?
     </string>
+    <string name="directions">Directions</string>
 
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
