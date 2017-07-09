@@ -19,7 +19,8 @@
     <color name="orange">#f3c760</color>
     <color name="medium_purple">#8282D0</color>
     <color name="bright_cyan">#16D9C0</color>
-    <color name="lawn_green">#1EFF00</color>
+    <color name="lawn_green_translucent">#bf29f489</color>
+    <color name="lawn_green">#29f489</color>
     <color name="red">#FF3B30</color>
 
     <!-- built-in tool to adjust color and alpha/opacity value, no need to set background alpha -->

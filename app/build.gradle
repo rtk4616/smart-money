@@ -65,4 +65,7 @@ dependencies {
 
     // Google Maps
     compile 'com.google.android.gms:play-services-maps:11.0.2'
+
+    // Search View
+    compile 'com.github.arimorty:floatingsearchview:2.1.1'
 }

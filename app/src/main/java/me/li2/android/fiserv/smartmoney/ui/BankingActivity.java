@@ -351,10 +351,12 @@ public class BankingActivity extends AppCompatActivity
             new BankingOperationFragment.OnBankingOperationSelectListener() {
                 @Override
                 public void onBankingOperationSelect(@BankingOperationFragment.BankingOperation int operation) {
-                    Toast.makeText(getApplicationContext(), "banking operation " + operation, Toast.LENGTH_SHORT).show();
                     switch (operation) {
                         case BankingOperationFragment.BANKING_OPERATION_OFFERS:
                             addFragmentToStack(new OfferSearchFragment(), FragmentTag.OFFER_SEARCH);
+                            break;
+                        default:
+                            Toast.makeText(getApplicationContext(), "banking operation " + operation, Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }

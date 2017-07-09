@@ -9,10 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import me.li2.android.fiserv.smartmoney.R;
@@ -22,10 +27,26 @@ import me.li2.android.fiserv.smartmoney.R;
  * https://github.com/li2
  */
 
-public class OfferSearchFragment extends Fragment implements OnMapReadyCallback {
+public class OfferSearchFragment extends Fragment implements
+        OnMapReadyCallback,
+        OnMarkerClickListener {
+
     private static final String TAG = "BankingMap";
     private static final String MAP_FRAGMENT_TAG = "map";
+    private static final LatLng AUCKLAND = new LatLng(-36.8485, 174.7633);
+
     private SupportMapFragment mMapFragment;
+
+    private GoogleMap mMap;
+
+    private Marker mAcukland;
+
+    /**
+     * Keeps track of the last selected marker (though it may no longer be selected).  This is
+     * useful for refreshing the info window.
+     */
+    private Marker mSelectedMarker;
+
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -57,7 +78,28 @@ public class OfferSearchFragment extends Fragment implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(174.7633, 36.8485)).title("Aculand"));
+        mMap = map;
+
+        // Hide map toolbar : bottom Navigation & GPS Pointer buttons
+        map.getUiSettings().setMapToolbarEnabled(false);
+
+        // Hide the zoom controls as the button panel will cover it.
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+
+        // Add lots of markers to the map.
+        addMarkersToMap();
+
+        // Set listeners for marker events.  See the bottom of this class for their behavior.
+        mMap.setOnMarkerClickListener(this);
+
+        // Override the default content description on the view, for accessibility mode.
+        // Ideally this string would be localised.
+        mMap.setContentDescription("Map with lots of markers.");
+
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(AUCKLAND)
+                .build();
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
     }
 
     @Override
@@ -65,5 +107,27 @@ public class OfferSearchFragment extends Fragment implements OnMapReadyCallback 
         Log.d(TAG, "onDestroy");
         getActivity().getSupportFragmentManager().beginTransaction().remove(mMapFragment).commit();
         super.onDestroy();
+    }
+
+    private void addMarkersToMap() {
+        mAcukland = mMap.addMarker(new MarkerOptions()
+                .position(AUCKLAND)
+                .title("Auckland")
+                .snippet("My Dream")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_gray)));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        // The user has re-tapped on the marker which was already showing an info window.
+        if (marker.equals(mSelectedMarker)) {
+            mSelectedMarker = null;
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_gray));
+            return true;
+        }
+
+        mSelectedMarker = marker;
+        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_green));
+        return false;
     }
 }
