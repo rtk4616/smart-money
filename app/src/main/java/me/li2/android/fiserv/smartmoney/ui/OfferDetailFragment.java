@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,6 +23,24 @@ public class OfferDetailFragment extends Fragment {
     @BindView(R.id.offer_info_header_view)
     View mHeaderView;
 
+    @BindView(R.id.offer_brand_icon_view)
+    ImageView mBrandIconView;
+
+    @BindView(R.id.offer_brand_name_view)
+    TextView mBrandNameView;
+
+    @BindView(R.id.offer_brand_addr_view)
+    TextView mBrandAddrView;
+
+    @BindView(R.id.offer_date_expire_view)
+    TextView mDateExpireView;
+
+    @BindView(R.id.offer_distance_view)
+    TextView mDistanceView;
+
+    @BindView(R.id.offer_saved_next_view)
+    TextView mSavedView;
+
     private ViewGroup.LayoutParams mHeaderLayoutParams;
     private int mHeaderMaxHeight;
 
@@ -34,6 +54,14 @@ public class OfferDetailFragment extends Fragment {
         mHeaderMaxHeight = (int)(getResources().getDimension(R.dimen.offer_info_header_height));
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // TODO fake data
+        mDistanceView.setText(String.format(getString(R.string.offer_distance_pattern), 0.1f));
+        mSavedView.setText(String.format(getString(R.string.offer_money_saved_next_purchase_pattern), 20.2f, mBrandNameView.getText()));
     }
 
     public void setHeaderHeight(float percent) {

@@ -173,7 +173,7 @@ public class BankingActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_banking) {
-
+            backToMyBanking();
         } else if (id == R.id.nav_connect) {
 
         } else if (id == R.id.nav_settings) {
@@ -185,6 +185,13 @@ public class BankingActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    synchronized private void backToMyBanking() {
+        int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+        while (backStackEntryCount-- > 0) {
+            getSupportFragmentManager().popBackStack();
+        }
     }
 
 
@@ -325,6 +332,8 @@ public class BankingActivity extends AppCompatActivity
         }
         if (sharedElement != null && ViewCompat.getTransitionName(sharedElement) != null) {
             ft.addSharedElement(sharedElement, ViewCompat.getTransitionName(sharedElement)); // NOTE21-transition
+        } else {
+            ft.setTransition(android.R.transition.explode);
         }
         ft.commit();
     }
