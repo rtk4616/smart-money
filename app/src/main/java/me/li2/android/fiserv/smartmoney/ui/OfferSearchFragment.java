@@ -175,21 +175,16 @@ public class OfferSearchFragment extends Fragment implements
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
             Log.d(TAG, "onPanelSlide, offset " + slideOffset);
+            // 滑下去 1 -> 0
+            // 滑上来 0 -> 1
+            if (mDetailFragment != null && slideOffset > 0) {
+                mDetailFragment.setHeaderHeight(slideOffset);
+            }
         }
 
         @Override
         public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
             Log.d(TAG, "onPanelStateChanged " + newState);
-            if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                if (mDetailFragment != null) {
-                    mDetailFragment.showHeader(true);
-                }
-            } else if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
-                if (mDetailFragment != null) {
-                    mDetailFragment.showHeader(false);
-                }
-            }
-
         }
     };
 
