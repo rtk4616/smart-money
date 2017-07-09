@@ -41,6 +41,14 @@ Transactions fake data: http://li2.me/assets/file/fiserv_test_data_transaction_l
 | <img src="./README/ui-BankingActivity-07102017001640.png" width=300> | <img src="./README/ui-BankingActivity-07102017001720.png" width=300> |
 
 
+## Animations
+
+![My Banking -> Account List -> Transaction List](README/gif1.gif)
+![Transaction -> Connect Activity](README/gif2.gif)
+![Expanded List](README/gif3.gif)
+![ViewProperty Animation](README/gif4.gif)
+![Offers Panel Drag up-down](README/gif5.gif)
+
 ## About
 
 2017-06-30 ~ 2017-07-09
