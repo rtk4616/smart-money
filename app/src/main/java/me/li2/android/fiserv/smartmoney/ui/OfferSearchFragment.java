@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,8 @@ public class OfferSearchFragment extends Fragment implements
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout mRootLayout;
 
+    private OfferDetailFragment mDetailFragment;
+
     private SupportMapFragment mMapFragment;
 
     private GoogleMap mMap;
@@ -66,6 +69,7 @@ public class OfferSearchFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_offer_search, container, false);
         ButterKnife.bind(this, view);
 
+        // setup Google Map fragment
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getActivity().getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
         if (mapFragment == null) {
@@ -78,7 +82,19 @@ public class OfferSearchFragment extends Fragment implements
         mMapFragment = mapFragment;
         mMapFragment.getMapAsync(this);
 
+        // init sliding panel
         mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        mRootLayout.addPanelSlideListener(mPanelSlideListener);
+
+        // listen back key
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(mOnKeyListener);
+
+        // NOTE21: to get fragment in anther fragment's layout, should use getChildFragmentManager
+        mDetailFragment = (OfferDetailFragment)
+                getChildFragmentManager().findFragmentById(R.id.dragView);
+        Log.d(TAG, "detailFragment " + mDetailFragment);
 
         return view;
     }
@@ -137,6 +153,45 @@ public class OfferSearchFragment extends Fragment implements
         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_green));
         return false;
     }
+
+    private View.OnKeyListener mOnKeyListener = new View.OnKeyListener() {
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (mRootLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED
+                        || mRootLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED) {
+                    mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    return true;
+                } else if (mRootLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                    mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+
+    private SlidingUpPanelLayout.PanelSlideListener mPanelSlideListener = new SlidingUpPanelLayout.PanelSlideListener() {
+        @Override
+        public void onPanelSlide(View panel, float slideOffset) {
+            Log.d(TAG, "onPanelSlide, offset " + slideOffset);
+        }
+
+        @Override
+        public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+            Log.d(TAG, "onPanelStateChanged " + newState);
+            if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                if (mDetailFragment != null) {
+                    mDetailFragment.showHeader(true);
+                }
+            } else if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
+                if (mDetailFragment != null) {
+                    mDetailFragment.showHeader(false);
+                }
+            }
+
+        }
+    };
 
     private void togglePanel() {
         if (mRootLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN) {
