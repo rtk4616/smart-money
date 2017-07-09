@@ -55,5 +55,8 @@ Transactions fake data: http://li2.me/assets/file/fiserv_test_data_transaction_l
 
 weiyi.just2@gmail.com
 
-https://li2.me
+http://li2.me
+
+https://stackoverflow.com/users/2722270/li2
+
 
