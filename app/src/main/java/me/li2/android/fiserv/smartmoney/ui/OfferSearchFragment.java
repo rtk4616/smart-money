@@ -19,7 +19,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
 
 /**
@@ -34,6 +37,9 @@ public class OfferSearchFragment extends Fragment implements
     private static final String TAG = "BankingMap";
     private static final String MAP_FRAGMENT_TAG = "map";
     private static final LatLng AUCKLAND = new LatLng(-36.8485, 174.7633);
+
+    @BindView(R.id.sliding_layout)
+    SlidingUpPanelLayout mRootLayout;
 
     private SupportMapFragment mMapFragment;
 
@@ -51,16 +57,14 @@ public class OfferSearchFragment extends Fragment implements
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        Log.d(TAG, "onCreate");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         // Binary XML file line #8: Duplicate id R.id.map, tag null, with another fragment for com.google.android.gms.maps.MapFragment
         View view = inflater.inflate(R.layout.fragment_offer_search, container, false);
-
+        ButterKnife.bind(this, view);
 
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getActivity().getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
@@ -73,6 +77,9 @@ public class OfferSearchFragment extends Fragment implements
         }
         mMapFragment = mapFragment;
         mMapFragment.getMapAsync(this);
+
+        mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
         return view;
     }
 
@@ -112,13 +119,13 @@ public class OfferSearchFragment extends Fragment implements
     private void addMarkersToMap() {
         mAcukland = mMap.addMarker(new MarkerOptions()
                 .position(AUCKLAND)
-                .title("Auckland")
-                .snippet("My Dream")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_gray)));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        togglePanel();
+
         // The user has re-tapped on the marker which was already showing an info window.
         if (marker.equals(mSelectedMarker)) {
             mSelectedMarker = null;
@@ -129,5 +136,13 @@ public class OfferSearchFragment extends Fragment implements
         mSelectedMarker = marker;
         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_green));
         return false;
+    }
+
+    private void togglePanel() {
+        if (mRootLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN) {
+            mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        } else {
+            mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
     }
 }

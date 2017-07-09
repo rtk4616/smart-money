@@ -17,12 +17,12 @@
     <include
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        layout="@layout/widget_offer_main_screen"/>
+        layout="@layout/widget_offer_serach_content"/>
 
     <!-- SLIDING LAYOUT -->
-    <include
+    <fragment
         android:id="@+id/dragView"
-        layout="@layout/widget_offer_info_panel"
+        class="me.li2.android.fiserv.smartmoney.ui.OfferDetailFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
