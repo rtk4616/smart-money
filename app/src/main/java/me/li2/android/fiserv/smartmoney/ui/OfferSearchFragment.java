@@ -1,9 +1,12 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,9 +25,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.OfferItem;
+import me.li2.android.fiserv.smartmoney.model.Offers;
+import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
+import me.li2.android.fiserv.smartmoney.webservice.FiservService;
+import me.li2.android.fiserv.smartmoney.webservice.ServiceGenerator;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by weiyi on 08/07/2017.
@@ -37,7 +51,7 @@ public class OfferSearchFragment extends Fragment implements
 
     private static final String TAG = "BankingMap";
     private static final String MAP_FRAGMENT_TAG = "map";
-    private static final LatLng AUCKLAND = new LatLng(-36.8485, 174.7633);
+    private static final LatLng AUCKLAND  = new LatLng(-36.8485, 174.7633);
 
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout mRootLayout;
@@ -48,7 +62,7 @@ public class OfferSearchFragment extends Fragment implements
 
     private GoogleMap mMap;
 
-    private Marker mAcukland;
+    private ArrayList<OfferItem> mOfferItems;
 
     /**
      * Keeps track of the last selected marker (though it may no longer be selected).  This is
@@ -101,6 +115,7 @@ public class OfferSearchFragment extends Fragment implements
 
     @Override
     public void onMapReady(GoogleMap map) {
+        loadOffers();
         mMap = map;
 
         // Hide map toolbar : bottom Navigation & GPS Pointer buttons
@@ -109,21 +124,14 @@ public class OfferSearchFragment extends Fragment implements
         // Hide the zoom controls as the button panel will cover it.
         mMap.getUiSettings().setZoomControlsEnabled(false);
 
-        // Add lots of markers to the map.
-        addMarkersToMap();
-
         // Set listeners for marker events.  See the bottom of this class for their behavior.
         mMap.setOnMarkerClickListener(this);
 
         // Override the default content description on the view, for accessibility mode.
         // Ideally this string would be localised.
         mMap.setContentDescription("Map with lots of markers.");
-
-        LatLngBounds bounds = new LatLngBounds.Builder()
-                .include(AUCKLAND)
-                .build();
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
     }
+
 
     @Override
     public void onDestroy() {
@@ -132,11 +140,67 @@ public class OfferSearchFragment extends Fragment implements
         super.onDestroy();
     }
 
-    private void addMarkersToMap() {
-        mAcukland = mMap.addMarker(new MarkerOptions()
-                .position(AUCKLAND)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_gray)));
+    private void loadOffers() {
+        showLoadingDialog();
+        FiservService service = ServiceGenerator.createService(FiservService.class);
+        service.getOffers().enqueue(new Callback<Offers>() {
+            @Override
+            public void onResponse(Call<Offers> call, Response<Offers> response) {
+                hideLoadingDialog();
+                mOfferItems = response.body().offers;
+                if (mOfferItems != null) {
+                    addMarkersToMap();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Offers> call, Throwable t) {
+
+            }
+        });
     }
+
+    private Dialog mLoadingDialog;
+
+    private void showLoadingDialog() {
+        mLoadingDialog = ViewUtils.showLoadingDialog(new WeakReference<Activity>(getActivity()),
+                getString(R.string.loading));
+    }
+
+    private void hideLoadingDialog() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
+            mLoadingDialog = null;
+        }
+    }
+
+    // Add lots of markers to the map.
+    private void addMarkersToMap() {
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        for (OfferItem item : mOfferItems) {
+            LatLng latLng = new LatLng(item.coord.lon, item.coord.lat);
+            int iconResId = R.drawable.i_map_marker_shopping_zone_gray;
+
+            if (!TextUtils.isEmpty(item.type)) {
+                if (item.type.equals("coffee")) {
+                    iconResId = R.drawable.i_map_marker_coffee_gray;
+                } else if (item.type.equals("book")) {
+                    iconResId = R.drawable.i_map_marker_book_gray;
+                }
+            }
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .icon(BitmapDescriptorFactory.fromResource(iconResId));
+            mMap.addMarker(markerOptions);
+
+            boundsBuilder.include(latLng);
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 50));
+    }
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {

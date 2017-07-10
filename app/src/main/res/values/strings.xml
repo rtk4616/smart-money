@@ -6,6 +6,7 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="loading">Loading...</string>
     <string name="logging_in">Securely logging in...</string>
     <string name="logging_in_failed">Failed to login to get account info, please try again.</string>
     <string name="try_again">Retry</string>
