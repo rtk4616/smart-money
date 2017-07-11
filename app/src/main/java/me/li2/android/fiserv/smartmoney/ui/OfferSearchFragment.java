@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -242,6 +243,17 @@ public class OfferSearchFragment extends Fragment implements
         return null;
     }
 
+    private List<OfferItem> findSameTypeOfferItems(OfferItem selectedItem) {
+        ArrayList<OfferItem> items = new ArrayList<>();
+        for (OfferItem item : mOfferItems) {
+            if (item.type.equals(selectedItem.type)) {
+                items.add(item);
+                continue;
+            }
+        }
+        return items;
+    }
+
     /*
     - no selected : set icon selected; show panel; update panel data;
     - has selected:
@@ -275,6 +287,7 @@ public class OfferSearchFragment extends Fragment implements
             }
             mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             mDetailFragment.update(offerItem);
+            mDetailFragment.addMarkersToMap(findSameTypeOfferItems(offerItem));
             mLastSelectedMarker = marker;
         }
     }

@@ -3,11 +3,25 @@ package me.li2.android.fiserv.smartmoney.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,7 +33,11 @@ import me.li2.android.fiserv.smartmoney.model.OfferItem;
  * https://github.com/li2
  */
 
-public class OfferDetailFragment extends Fragment {
+public class OfferDetailFragment extends Fragment implements
+        OnMapReadyCallback,
+        OnMarkerClickListener {
+
+    private static final String TAG = "OfferDetailFragment";
 
     @BindView(R.id.offer_info_header_view)
     View mHeaderView;
@@ -48,11 +66,20 @@ public class OfferDetailFragment extends Fragment {
     private String mDistancePattern;
     private String mSavedPattern;
 
+    private GoogleMap mMap;
+
+    private List<OfferItem> mOfferItems;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_offer_detail, container, false);
         ButterKnife.bind(this, view);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mini_map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         mHeaderLayoutParams = mHeaderView.getLayoutParams();
         mHeaderMaxHeight = (int)(getResources().getDimension(R.dimen.offer_info_header_height));
@@ -62,6 +89,26 @@ public class OfferDetailFragment extends Fragment {
         mSavedPattern = getString(R.string.offer_money_saved_next_purchase_pattern);
 
         return view;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        mMap = map;
+
+        // Hide map toolbar : bottom Navigation & GPS Pointer buttons
+        map.getUiSettings().setMapToolbarEnabled(false);
+
+        // Hide the zoom controls as the button panel will cover it.
+        map.getUiSettings().setZoomControlsEnabled(false);
+
+        // Set listeners for marker events.  See the bottom of this class for their behavior.
+        map.setOnMarkerClickListener(this);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        update(findMarker(marker));
+        return false;
     }
 
     public void setHeaderHeight(float percent) {
@@ -86,5 +133,37 @@ public class OfferDetailFragment extends Fragment {
         mDateExpireView.setText(String .format(mExpirePattern, item.expire));
         mDistanceView.setText(String.format(mDistancePattern, item.distance));
         mSavedView.setText(String.format(mSavedPattern, item.saved, item.name));
+    }
+
+    // Add lots of markers to the map.
+    public void addMarkersToMap(List<OfferItem> sameTypeItems) {
+        mOfferItems = sameTypeItems;
+        if (mMap == null) {
+            Log.e(TAG, "map not ready");
+            return;
+        }
+
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        for (OfferItem item : sameTypeItems) {
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(item.latLng)
+                    .icon(BitmapDescriptorFactory.fromResource(item.selectedIconResId));
+            mMap.addMarker(markerOptions);
+
+            boundsBuilder.include(item.latLng);
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 50));
+    }
+
+    private OfferItem findMarker(Marker marker) {
+        LatLng latLng = marker.getPosition();
+        for (OfferItem item : mOfferItems) {
+            if (item.latLng.equals(latLng)) {
+                return item;
+            }
+        }
+        return null;
     }
 }
