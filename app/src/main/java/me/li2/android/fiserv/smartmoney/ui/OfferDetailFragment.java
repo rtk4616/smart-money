@@ -29,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTouch;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.Configuration;
 import me.li2.android.fiserv.smartmoney.model.OfferItem;
 
 /**
@@ -98,6 +99,9 @@ public class OfferDetailFragment extends Fragment implements
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
+        // set default location
+        map.moveCamera(CameraUpdateFactory.newLatLng(Configuration.AUCKLAND));
+
         // Hide map toolbar : bottom Navigation & GPS Pointer buttons
         map.getUiSettings().setMapToolbarEnabled(false);
 
@@ -161,7 +165,8 @@ public class OfferDetailFragment extends Fragment implements
             boundsBuilder.include(item.latLng);
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 50));
+        // set padding for makers to make sure all markers are in centre of map, units in pixel.
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 512));
     }
 
     private OfferItem findMarker(Marker marker) {

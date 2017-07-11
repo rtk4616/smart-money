@@ -18,7 +18,6 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,6 +31,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.Configuration;
 import me.li2.android.fiserv.smartmoney.model.OfferItem;
 import me.li2.android.fiserv.smartmoney.model.Offers;
 import me.li2.android.fiserv.smartmoney.utils.ViewUtils;
@@ -52,7 +52,6 @@ public class OfferSearchFragment extends Fragment implements
 
     private static final String TAG = "BankingMap";
     private static final String MAP_FRAGMENT_TAG = "map";
-    private static final LatLng AUCKLAND  = new LatLng(-36.8485, 174.7633);
 
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout mRootLayout;
@@ -118,6 +117,9 @@ public class OfferSearchFragment extends Fragment implements
     public void onMapReady(GoogleMap map) {
         loadOffers();
         mMap = map;
+
+        // set default location
+        map.moveCamera(CameraUpdateFactory.newLatLng(Configuration.AUCKLAND));
 
         // Hide map toolbar : bottom Navigation & GPS Pointer buttons
         map.getUiSettings().setMapToolbarEnabled(false);
@@ -191,7 +193,7 @@ public class OfferSearchFragment extends Fragment implements
             boundsBuilder.include(item.latLng);
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 50));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 256));
     }
 
 
