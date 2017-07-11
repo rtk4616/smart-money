@@ -12,6 +12,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.li2.android.fiserv.smartmoney.R;
+import me.li2.android.fiserv.smartmoney.model.OfferItem;
 
 /**
  * Created by weiyi on 09/07/2017.
@@ -43,6 +44,9 @@ public class OfferDetailFragment extends Fragment {
 
     private ViewGroup.LayoutParams mHeaderLayoutParams;
     private int mHeaderMaxHeight;
+    private String mExpirePattern;
+    private String mDistancePattern;
+    private String mSavedPattern;
 
     @Nullable
     @Override
@@ -53,15 +57,11 @@ public class OfferDetailFragment extends Fragment {
         mHeaderLayoutParams = mHeaderView.getLayoutParams();
         mHeaderMaxHeight = (int)(getResources().getDimension(R.dimen.offer_info_header_height));
 
-        return view;
-    }
+        mExpirePattern = getString(R.string.offer_expire_pattern);
+        mDistancePattern = getString(R.string.offer_distance_pattern);
+        mSavedPattern = getString(R.string.offer_money_saved_next_purchase_pattern);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        // TODO fake data
-        mDistanceView.setText(String.format(getString(R.string.offer_distance_pattern), 0.1f));
-        mSavedView.setText(String.format(getString(R.string.offer_money_saved_next_purchase_pattern), 20.2f, mBrandNameView.getText()));
+        return view;
     }
 
     public void setHeaderHeight(float percent) {
@@ -74,5 +74,17 @@ public class OfferDetailFragment extends Fragment {
             mHeaderLayoutParams.height = height;
             mHeaderView.setLayoutParams(mHeaderLayoutParams);
         }
+    }
+
+    public void update(OfferItem item) {
+        if (item == null || getView() == null) {
+            return;
+        }
+        mBrandIconView.setImageResource(item.selectedIconResId);
+        mBrandNameView.setText(item.name);
+        mBrandAddrView.setText(item.street);
+        mDateExpireView.setText(String .format(mExpirePattern, item.expire));
+        mDistanceView.setText(String.format(mDistancePattern, item.distance));
+        mSavedView.setText(String.format(mSavedPattern, item.saved, item.name));
     }
 }

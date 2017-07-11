@@ -18,33 +18,39 @@
 
     <TextView
         android:id="@+id/offer_brand_name_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:maxLines="1"
+        android:ellipsize="end"
         android:text="Michael Lors"
         android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.ListItem.Large"
         app:layout_constraintLeft_toRightOf="@+id/offer_brand_icon_view"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <TextView
         android:id="@+id/offer_brand_addr_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
         android:maxLines="1"
+        android:ellipsize="end"
         android:text="430 W 51st St,"
         android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.ListItem.Small"
         app:layout_constraintLeft_toLeftOf="@+id/offer_brand_name_view"
-        app:layout_constraintTop_toBottomOf="@+id/offer_brand_name_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/offer_brand_name_view"
+        app:layout_constraintRight_toLeftOf="@+id/offer_activated_btn"
+        android:layout_marginRight="8dp"/>
 
     <TextView
         android:id="@+id/offer_date_expire_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
@@ -53,7 +59,9 @@
         android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.ListItem.Small"
         app:layout_constraintLeft_toLeftOf="@+id/offer_brand_addr_view"
-        app:layout_constraintTop_toBottomOf="@+id/offer_brand_addr_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/offer_brand_addr_view"
+        app:layout_constraintRight_toLeftOf="@+id/offer_activated_btn"
+        android:layout_marginRight="8dp"/>
 
     <Button
         android:id="@+id/offer_activated_btn"
@@ -85,14 +93,17 @@
 
     <TextView
         android:id="@+id/offer_distance_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:drawablePadding="8dp"
         android:drawableStart="@drawable/i_pin"
         android:text="@string/offer_distance_pattern"
+        android:textAlignment="textStart"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textView8"
         app:layout_constraintTop_toBottomOf="@+id/view5"/>
 
     <TextView

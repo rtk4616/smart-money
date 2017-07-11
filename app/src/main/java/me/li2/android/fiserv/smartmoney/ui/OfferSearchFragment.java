@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,7 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,13 +61,13 @@ public class OfferSearchFragment extends Fragment implements
 
     private GoogleMap mMap;
 
-    private ArrayList<OfferItem> mOfferItems;
+    private List<OfferItem> mOfferItems;
 
     /**
      * Keeps track of the last selected marker (though it may no longer be selected).  This is
      * useful for refreshing the info window.
      */
-    private Marker mSelectedMarker;
+    private Marker mLastSelectedMarker;
 
 
     @Override
@@ -179,23 +178,12 @@ public class OfferSearchFragment extends Fragment implements
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
         for (OfferItem item : mOfferItems) {
-            LatLng latLng = new LatLng(item.coord.lon, item.coord.lat);
-            int iconResId = R.drawable.i_map_marker_shopping_zone_gray;
-
-            if (!TextUtils.isEmpty(item.type)) {
-                if (item.type.equals("coffee")) {
-                    iconResId = R.drawable.i_map_marker_coffee_gray;
-                } else if (item.type.equals("book")) {
-                    iconResId = R.drawable.i_map_marker_book_gray;
-                }
-            }
-
             MarkerOptions markerOptions = new MarkerOptions()
-                    .position(latLng)
-                    .icon(BitmapDescriptorFactory.fromResource(iconResId));
+                    .position(item.latLng)
+                    .icon(BitmapDescriptorFactory.fromResource(item.unselectedIconResId));
             mMap.addMarker(markerOptions);
 
-            boundsBuilder.include(latLng);
+            boundsBuilder.include(item.latLng);
         }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 50));
@@ -204,17 +192,11 @@ public class OfferSearchFragment extends Fragment implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        togglePanel();
-
-        // The user has re-tapped on the marker which was already showing an info window.
-        if (marker.equals(mSelectedMarker)) {
-            mSelectedMarker = null;
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_gray));
-            return true;
+        OfferItem offerItem = findMarker(marker);
+        if (offerItem == null) {
+            return false; // should never go here
         }
-
-        mSelectedMarker = marker;
-        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.i_map_marker_shopping_zone_green));
+        updateMarkerStatus(marker);
         return false;
     }
 
@@ -227,7 +209,7 @@ public class OfferSearchFragment extends Fragment implements
                     mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                     return true;
                 } else if (mRootLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
-                    mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                    updateMarkerStatus(mLastSelectedMarker);
                     return true;
                 }
             }
@@ -239,8 +221,6 @@ public class OfferSearchFragment extends Fragment implements
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
             Log.d(TAG, "onPanelSlide, offset " + slideOffset);
-            // 滑下去 1 -> 0
-            // 滑上来 0 -> 1
             if (mDetailFragment != null && slideOffset > 0) {
                 mDetailFragment.setHeaderHeight(slideOffset);
             }
@@ -252,11 +232,50 @@ public class OfferSearchFragment extends Fragment implements
         }
     };
 
-    private void togglePanel() {
-        if (mRootLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN) {
+    private OfferItem findMarker(Marker marker) {
+        LatLng latLng = marker.getPosition();
+        for (OfferItem item : mOfferItems) {
+            if (item.latLng.equals(latLng)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /*
+    - no selected : set icon selected; show panel; update panel data;
+    - has selected:
+        - same one: set icon not selected; hide panel; (same as Back Key)
+        - different one: set icon1 not selected, set icon2 selected; update panel data;
+    */
+    private void updateMarkerStatus(Marker marker) {
+        OfferItem offerItem = findMarker(marker);
+        if (offerItem == null) {
+            return; // should never go here
+        }
+
+        if (marker.equals(mLastSelectedMarker)) {
+            /** re-tapped on the marker which was already selected */
+            marker.setIcon(BitmapDescriptorFactory.fromResource(offerItem.unselectedIconResId));
             mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            mLastSelectedMarker = null;
         } else {
+            if (mLastSelectedMarker == null) {
+                /** no marker selected */
+                marker.setIcon(BitmapDescriptorFactory.fromResource(offerItem.selectedIconResId));
+            } else {
+                /** select another marker */
+                OfferItem lastOfferItem = findMarker(mLastSelectedMarker);
+                if (lastOfferItem != null) {
+                    mLastSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(lastOfferItem.unselectedIconResId));
+                } else {
+                    // should not go here.
+                }
+                marker.setIcon(BitmapDescriptorFactory.fromResource(offerItem.selectedIconResId));
+            }
             mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            mDetailFragment.update(offerItem);
+            mLastSelectedMarker = marker;
         }
     }
 }

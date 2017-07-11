@@ -5,6 +5,10 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import me.li2.android.fiserv.smartmoney.model.OfferItem;
+import me.li2.android.fiserv.smartmoney.model.OfferItemDeserializer;
+import me.li2.android.fiserv.smartmoney.model.Offers;
+import me.li2.android.fiserv.smartmoney.model.OffersDeserializer;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -32,6 +36,8 @@ public class ServiceGenerator {
     private static Gson gson = new GsonBuilder()
             .setLenient()
             .setDateFormat(DATE_FORMAT)
+            .registerTypeAdapter(Offers.class, new OffersDeserializer())
+            .registerTypeAdapter(OfferItem.class, new OfferItemDeserializer())
             .create();
 
     private static HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor()
