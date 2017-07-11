@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTouch;
 import me.li2.android.fiserv.smartmoney.R;
 import me.li2.android.fiserv.smartmoney.model.OfferItem;
 
@@ -165,5 +167,29 @@ public class OfferDetailFragment extends Fragment implements
             }
         }
         return null;
+    }
+
+    // To fix issue that users cannot scroll the Google Map vertically with in a scrollable parent view.
+    // https://stackoverflow.com/a/17317176/2722270
+    @OnTouch(R.id.transparent_intercept_view)
+    public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
+        Log.d(TAG, "onTouch " + action);
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                // Disallow the scrollable parent view to intercept touch events.
+                getView().getParent().requestDisallowInterceptTouchEvent(true);
+                // Disable touch on transparent view.
+                return false;
+
+            case MotionEvent.ACTION_UP:
+                // Allow the scrollable parent view to intercept touch events.
+                getView().getParent().requestDisallowInterceptTouchEvent(false);
+                return true;
+
+            default:
+                return true;
+        }
     }
 }
