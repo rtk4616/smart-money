@@ -1,7 +1,9 @@
 package me.li2.android.fiserv.smartmoney.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -150,10 +152,7 @@ public class OfferSearchFragment extends Fragment implements
             @Override
             public void onResponse(Call<Offers> call, Response<Offers> response) {
                 hideLoadingDialog();
-                mOfferItems = response.body().offers;
-                if (mOfferItems != null) {
-                    addMarkersToMap();
-                }
+                onOffersGet(response.body());
             }
 
             @Override
@@ -161,6 +160,32 @@ public class OfferSearchFragment extends Fragment implements
 
             }
         });
+    }
+
+    private void onOffersGet(Offers offers) {
+        if (offers == null || offers.offers == null) {
+            showLoadingFailedDialog();
+            return;
+        }
+
+        mOfferItems = offers.offers;
+        if (mOfferItems != null) {
+            addMarkersToMap();
+        }
+    }
+
+    private void showLoadingFailedDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage(R.string.loading_offers_failed)
+                .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadOffers();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setCancelable(false)
+                .show();
     }
 
     private Dialog mLoadingDialog;

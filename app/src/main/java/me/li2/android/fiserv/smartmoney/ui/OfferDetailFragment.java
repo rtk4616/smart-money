@@ -70,6 +70,7 @@ public class OfferDetailFragment extends Fragment implements
     private String mDistancePattern;
     private String mSavedPattern;
 
+    private boolean mWaitMapReady = false;
     private GoogleMap mMap;
 
     private List<OfferItem> mOfferItems;
@@ -98,6 +99,10 @@ public class OfferDetailFragment extends Fragment implements
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
+        if (mWaitMapReady) {
+            addMarkersToMap(mOfferItems);
+            mWaitMapReady = false;
+        }
 
         // set default location
         map.moveCamera(CameraUpdateFactory.newLatLng(Configuration.AUCKLAND));
@@ -150,7 +155,8 @@ public class OfferDetailFragment extends Fragment implements
 
         mOfferItems = sameTypeItems;
         if (mMap == null) {
-            Log.e(TAG, "map not ready");
+            // this is UI thread, should not wait here, so just set a flag here.
+            mWaitMapReady = true;
             return;
         }
 
@@ -165,8 +171,14 @@ public class OfferDetailFragment extends Fragment implements
             boundsBuilder.include(item.latLng);
         }
 
-        // set padding for makers to make sure all markers are in centre of map, units in pixel.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 512));
+        /* set padding for makers to make sure all markers are in centre of map, units in pixel.
+        Note that cannot set too much padding, otherwise crash:
+        Error using newLatLngBounds(LatLngBounds, int): View size is too small after padding is applied.
+
+        The following code snippets illustrate some of the common ways to move the camera.
+        https://developers.google.com/maps/documentation/android-api/views
+         */
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 256));
     }
 
     private OfferItem findMarker(Marker marker) {
