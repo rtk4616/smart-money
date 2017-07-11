@@ -17,11 +17,12 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -138,7 +139,11 @@ public class OfferDetailFragment extends Fragment implements
     }
 
     // Add lots of markers to the map.
+    private HashMap<Marker, OfferItem> mMarkerOfferItemHashMap = new HashMap<>();
+
     public void addMarkersToMap(List<OfferItem> sameTypeItems) {
+        removeOldMarkers();
+
         mOfferItems = sameTypeItems;
         if (mMap == null) {
             Log.e(TAG, "map not ready");
@@ -151,8 +156,8 @@ public class OfferDetailFragment extends Fragment implements
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(item.latLng)
                     .icon(BitmapDescriptorFactory.fromResource(item.selectedIconResId));
-            mMap.addMarker(markerOptions);
-
+            Marker marker = mMap.addMarker(markerOptions);
+            mMarkerOfferItemHashMap.put(marker, item);
             boundsBuilder.include(item.latLng);
         }
 
@@ -160,13 +165,16 @@ public class OfferDetailFragment extends Fragment implements
     }
 
     private OfferItem findMarker(Marker marker) {
-        LatLng latLng = marker.getPosition();
-        for (OfferItem item : mOfferItems) {
-            if (item.latLng.equals(latLng)) {
-                return item;
-            }
+        return mMarkerOfferItemHashMap.get(marker);
+    }
+
+    private void removeOldMarkers() {
+        // use iterator to avoid ConcurrentModificationException
+        Iterator iterator = mMarkerOfferItemHashMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            Marker marker = (Marker) iterator.next();
+            marker.remove();
         }
-        return null;
     }
 
     // To fix issue that users cannot scroll the Google Map vertically with in a scrollable parent view.

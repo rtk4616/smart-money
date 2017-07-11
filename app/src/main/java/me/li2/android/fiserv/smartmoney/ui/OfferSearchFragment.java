@@ -26,6 +26,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -175,6 +176,8 @@ public class OfferSearchFragment extends Fragment implements
     }
 
     // Add lots of markers to the map.
+    private HashMap<Marker, OfferItem> mMarkerOfferItemHashMap = new HashMap<>();
+
     private void addMarkersToMap() {
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
@@ -182,7 +185,8 @@ public class OfferSearchFragment extends Fragment implements
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(item.latLng)
                     .icon(BitmapDescriptorFactory.fromResource(item.unselectedIconResId));
-            mMap.addMarker(markerOptions);
+            Marker marker = mMap.addMarker(markerOptions);
+            mMarkerOfferItemHashMap.put(marker, item);
 
             boundsBuilder.include(item.latLng);
         }
@@ -234,13 +238,7 @@ public class OfferSearchFragment extends Fragment implements
     };
 
     private OfferItem findMarker(Marker marker) {
-        LatLng latLng = marker.getPosition();
-        for (OfferItem item : mOfferItems) {
-            if (item.latLng.equals(latLng)) {
-                return item;
-            }
-        }
-        return null;
+        return mMarkerOfferItemHashMap.get(marker);
     }
 
     private List<OfferItem> findSameTypeOfferItems(OfferItem selectedItem) {
@@ -262,9 +260,6 @@ public class OfferSearchFragment extends Fragment implements
     */
     private void updateMarkerStatus(Marker marker) {
         OfferItem offerItem = findMarker(marker);
-        if (offerItem == null) {
-            return; // should never go here
-        }
 
         if (marker.equals(mLastSelectedMarker)) {
             /** re-tapped on the marker which was already selected */
@@ -278,11 +273,7 @@ public class OfferSearchFragment extends Fragment implements
             } else {
                 /** select another marker */
                 OfferItem lastOfferItem = findMarker(mLastSelectedMarker);
-                if (lastOfferItem != null) {
-                    mLastSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(lastOfferItem.unselectedIconResId));
-                } else {
-                    // should not go here.
-                }
+                mLastSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(lastOfferItem.unselectedIconResId));
                 marker.setIcon(BitmapDescriptorFactory.fromResource(offerItem.selectedIconResId));
             }
             mRootLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
