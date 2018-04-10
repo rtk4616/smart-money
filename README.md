@@ -1,6 +1,20 @@
 Fiserv Smart Money Demo App
 ===========================
 
+This is a demo Android application relates to banking. 
+
+- The source code is on my GitHub https://github.com/li2/Fiserv_SmartMoney
+- Built on Android Studio.
+- 4180 lines of code ( include 413 lines of comment ).
+- Only have 2 activities.
+- Almost all the UI widgets are managed by Fragment.
+- Use Retrofit to load data from server and parse Json file.
+- Use RecyclerView to build list, grid, expanded list view.
+- Material Design.
+- Animation.
+- ConstraintLayout to improve layout performance.
+
+
 ## Demo Video
 
 seems cannot play on GitHub page directly, you can download it [link](./README/trlteduoszcMMB29Mweiyi07102017002158.mp4)
